@@ -159,15 +159,15 @@ td.na{color:var(--muted)}
         <label for="backup">Backup battery weight<small>Enter 0 if none</small></label>
         <div class="inwrap"><input id="backup" type="number" inputmode="decimal" min="0" step="0.1" value="0"><span class="u">kg</span></div>
       </div>
+    </fieldset>
+
+    <details class="assume">
+      <summary>Advanced configuration</summary>
+      <p>Defaults suit typical setups. Change them if you have test-stand data.</p>
       <div class="field wide">
         <label for="tension">Tether tension</label>
         <div class="rangerow"><input id="tension" type="range" min="400" max="800" step="50" value="500"><output id="tensionOut" for="tension">500 g</output></div>
       </div>
-    </fieldset>
-
-    <details class="assume">
-      <summary>Assumptions</summary>
-      <p>Defaults suit typical multirotor propulsion. Change them if you have test-stand data.</p>
       <div class="field">
         <label for="rho">Air density<small>1.225 at 15 °C sea level, 1.16 at 30 °C</small></label>
         <div class="inwrap"><input id="rho" type="number" inputmode="decimal" min="0.5" max="1.4" step="0.005" value="1.225"><span class="u">kg/m³</span></div>
@@ -252,7 +252,7 @@ td.na{color:var(--muted)}
     if(!(p.backup>=0)) bad.push("backup battery weight (0 if none)");
     if(p.coax && p.n%2!==0) bad.push("number of rotors (must be even for coaxial)");
     if(p.coax && !(p.coaxLoss>=0)) bad.push("coaxial power penalty");
-    if(!(p.rho>0)||!(p.fm>0)||!(p.eta>0)||!(p.aux>=0)||!(p.reserve>=0&&p.reserve<1)) bad.push("assumptions");
+    if(!(p.rho>0)||!(p.fm>0)||!(p.eta>0)||!(p.aux>=0)||!(p.reserve>=0&&p.reserve<1)) bad.push("advanced configuration");
     return bad;
   }
   function diskArea(p){ const r = p.dIn*0.0254/2; return Math.PI*r*r*p.n; }
