@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Tether flight calculator</title>
+<title>Volarious Tethered Flight Calculator</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Semi+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#E9EEF1; --surface:#F7F9FA; --ink:#17232B; --muted:#56666F; --line:#C9D3D9;
-  --amber:#D09400; --steel:#2E5B78; --bad:#A8352A; --good:#2B7148; --chip:#DDE5EA;
+  --amber:#D09400; --steel:#2E5B78; --cable:#454B50; --bad:#A8352A; --good:#2B7148; --chip:#DDE5EA;
   color-scheme:light;
   box-sizing:border-box;
   padding-top:env(safe-area-inset-top,0px);
@@ -34,6 +34,10 @@ body{margin:0;background:var(--bg);color:var(--ink);
   font-family:"Barlow",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:17px;line-height:1.5}
 .cond{font-family:"Barlow Semi Condensed","Barlow",system-ui,sans-serif}
 header.top{max-width:1180px;margin:0 auto;padding:28px 20px 20px}
+#f{position:relative}
+.unitseg{display:flex;width:140px;position:absolute;top:5px;right:0;z-index:2;font-size:.8rem}
+.unitseg label{flex:1}
+.seg.unitseg span{padding:0;line-height:18px}
 header.top h1{font-family:"Barlow Semi Condensed","Barlow",system-ui,sans-serif;font-weight:700;font-size:2.1rem;line-height:1.1;margin:0 0 6px}
 header.top p{margin:0;color:var(--muted);max-width:62ch}
 .layout{display:grid;grid-template-columns:minmax(300px,380px) minmax(0,1fr);gap:32px;max-width:1180px;margin:0 auto;padding:0 20px 56px;align-items:start}
@@ -45,12 +49,21 @@ legend{font-family:"Barlow Semi Condensed","Barlow",system-ui,sans-serif;font-we
 .field{display:grid;grid-template-columns:1fr 140px;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--line)}
 .field.wide{grid-template-columns:1fr}
 .field[hidden]{display:none}
+.lblwrap{position:relative;font-weight:500}
+.tip{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;margin-left:6px;border-radius:50%;border:1.5px solid var(--muted);color:var(--muted);font-size:.72rem;font-weight:600;line-height:1;cursor:help;vertical-align:1px}
+.tip:hover,.tip:focus{border-color:var(--steel);color:var(--steel);outline:none}
+.tip-body{position:absolute;left:0;top:calc(100% + 6px);z-index:20;width:max-content;max-width:min(290px,80vw);padding:10px 12px;border-radius:8px;background:var(--ink);color:var(--bg);font-size:.86rem;font-weight:400;line-height:1.4;text-align:left;box-shadow:0 6px 18px rgba(0,0,0,.2);opacity:0;visibility:hidden;transition:opacity .12s;pointer-events:none}
+.tip-body>span{display:block}
+.tip-body>span+span{margin-top:4px}
+.tip:hover .tip-body,.tip:focus .tip-body{opacity:1;visibility:visible}
 .field label,.field .lbl{font-weight:500}
 .field small{display:block;color:var(--muted);font-size:.85rem;font-weight:400;line-height:1.3}
 .inwrap{display:flex;align-items:center;border:1px solid var(--line);background:var(--surface);border-radius:6px}
 .inwrap:focus-within{outline:2px solid var(--steel);outline-offset:1px}
 .inwrap input{width:100%;min-width:0;border:0;background:transparent;color:inherit;font:inherit;padding:7px 4px 7px 8px;text-align:right;outline:none}
 .inwrap .u{padding-right:9px;color:var(--muted);font-size:.9rem;white-space:nowrap}
+.inwrap select{width:100%;min-width:0;border:0;background:transparent;color:inherit;font:inherit;padding:7px 8px;outline:none;cursor:pointer;text-align:right;text-align-last:right}
+.inwrap select option{background:var(--surface);color:var(--ink);text-align:right}
 .seg{display:flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--surface)}
 .seg label{flex:1;position:relative;cursor:pointer}
 .seg input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
@@ -61,22 +74,30 @@ legend{font-family:"Barlow Semi Condensed","Barlow",system-ui,sans-serif;font-we
 .rangerow{display:flex;align-items:center;gap:12px}
 .rangerow input{flex:1;accent-color:var(--steel)}
 .rangerow output{min-width:56px;text-align:right;font-weight:600}
-details.assume{border-top:1px solid var(--line);padding-top:10px}
+details.assume{padding-top:0}
 details summary{cursor:pointer;font-weight:600}
 details summary:focus-visible{outline:2px solid var(--steel);outline-offset:2px}
 details.assume p{color:var(--muted);font-size:.9rem;margin:6px 0 4px}
 
 /* results */
-.hero{display:grid;grid-template-columns:190px minmax(0,1fr);gap:24px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px 22px}
-@media (max-width:520px){.hero{grid-template-columns:120px minmax(0,1fr);gap:14px;padding:16px}}
+.hero{display:grid;grid-template-columns:220px minmax(0,1fr);gap:24px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px 22px}
+@media (max-width:520px){.hero{grid-template-columns:130px minmax(0,1fr);gap:14px;padding:16px}}
 .hero svg{width:100%;height:auto;display:block}
-.rec{align-self:center}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--cable:#8E979D}}
+:root[data-theme="dark"]{--cable:#8E979D}
+section > h2:first-child{margin-top:0}
+.rec{display:flex;flex-direction:column;gap:16px;min-width:0}
 .rec .pick{font-family:"Barlow Semi Condensed","Barlow",system-ui,sans-serif;font-weight:600;font-size:1.25rem;margin:0}
-.rec .height{font-family:"Barlow Semi Condensed","Barlow",system-ui,sans-serif;font-weight:700;font-size:3.6rem;line-height:1;margin:6px 0 4px}
-.rec .height .mu{font-size:1.6rem;font-weight:600;margin-left:4px}
-.rec .sub{margin:0 0 10px;color:var(--muted)}
-.rec .why{margin:0;max-width:52ch}
-.rec.bad .height{color:var(--bad)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:16px 18px;flex:1;align-content:center}
+.stat{min-width:0}
+.stat .k{font-size:.8rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.stat .v{font-family:"Barlow Semi Condensed","Barlow",system-ui,sans-serif;font-weight:700;font-size:2.8rem;line-height:1.05;margin-top:4px;white-space:nowrap}
+.stat .v .mu{font-size:1.6rem;font-weight:600;margin-left:4px}
+.stat.unit .v{color:var(--steel)}
+.stat .s{color:var(--muted);font-size:.95rem}
+.rec .why{margin:auto 0 0;padding-top:12px;border-top:1px solid var(--line);color:var(--muted);font-size:.9rem;max-width:60ch}
+.rec.bad .stat .v{color:var(--bad)}
+@media (max-width:520px){.stat .v{font-size:2.3rem}.stat .v .mu{font-size:1.2rem}.stats{gap:10px}}
 h2{font-family:"Barlow Semi Condensed","Barlow",system-ui,sans-serif;font-weight:600;font-size:1.25rem;margin:30px 0 10px}
 .tablewrap{overflow-x:auto}
 table{border-collapse:collapse;width:100%;min-width:460px;font-variant-numeric:tabular-nums}
@@ -84,6 +105,7 @@ th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);verti
 thead th{font-family:"Barlow Semi Condensed","Barlow",system-ui,sans-serif;font-weight:600;font-size:1.05rem;border-bottom:2px solid var(--ink)}
 tbody th{font-weight:500;color:var(--muted);width:38%}
 td.na{color:var(--muted)}
+.thsub{display:block;font-family:"Barlow",system-ui,sans-serif;font-weight:500;font-size:.88rem;color:var(--muted)}
 .tag{display:inline-block;font-size:.8rem;font-weight:600;padding:1px 8px;border-radius:20px;background:var(--chip);margin-left:6px;vertical-align:2px}
 .tag.best{background:var(--ink);color:var(--bg)}
 .chartwrap{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 12px 8px;overflow-x:auto}
@@ -93,6 +115,9 @@ td.na{color:var(--muted)}
 .legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:.88rem;color:var(--muted);padding:6px 6px 4px}
 .legend i{display:inline-block;width:18px;height:0;border-top:3px solid;vertical-align:4px;margin-right:6px}
 .legend i.d{border-top-style:dashed;border-top-width:2px}
+.legend .lbreak{flex-basis:100%;height:4px}
+.legend i.faded{border-color:var(--muted);opacity:.35}
+.legend b.c{display:inline-block;width:11px;height:11px;border-radius:50%;border:2px solid var(--muted);margin-right:7px;vertical-align:-1px}
 .method{margin-top:26px;border-top:1px solid var(--line);padding-top:12px}
 .method p,.method li{color:var(--muted);font-size:.95rem;max-width:72ch}
 .method code{font-size:.9rem}
@@ -104,12 +129,16 @@ td.na{color:var(--muted)}
 </head>
 <body>
 <header class="top">
-  <h1>Tether flight calculator</h1>
+  <h1>Volarious Tethered Flight Calculator</h1>
   <p>Enter the drone’s specs and the payload you want to carry. The calculator picks the air unit and the longest tether the drone can hold in hover.</p>
 </header>
 
 <main class="layout">
   <form id="f" onsubmit="return false" novalidate>
+    <div class="seg unitseg" role="radiogroup" aria-label="Units">
+      <label><input type="radio" name="units" value="metric" checked><span>Metric</span></label>
+      <label><input type="radio" name="units" value="imperial"><span>Imperial</span></label>
+    </div>
     <fieldset>
       <legend>Drone</legend>
       <div class="field">
@@ -120,20 +149,12 @@ td.na{color:var(--muted)}
         <label for="d">Rotor size</label>
         <div class="inwrap"><input id="d" type="number" inputmode="decimal" min="5" max="60" step="0.5" value="22"><span class="u">in</span></div>
       </div>
-      <div class="field wide">
-        <span class="lbl" id="cellsLbl">Battery configuration</span>
-        <div class="seg" role="radiogroup" aria-labelledby="cellsLbl">
-          <label><input type="radio" name="cells" value="6"><span>6S</span></label>
-          <label><input type="radio" name="cells" value="12" checked><span>12S</span></label>
-          <label><input type="radio" name="cells" value="14"><span>14S</span></label>
-        </div>
-      </div>
-      <div class="field wide">
-        <span class="lbl" id="layoutLbl">Frame layout</span>
-        <div class="seg" role="radiogroup" aria-labelledby="layoutLbl">
-          <label><input type="radio" name="layout" value="flat" checked><span>Flat</span></label>
-          <label><input type="radio" name="layout" value="coax"><span>Coaxial</span></label>
-        </div>
+      <div class="field">
+        <label for="layout">Frame layout</label>
+        <div class="inwrap"><select id="layout">
+          <option value="flat" selected>Flat</option>
+          <option value="coax">Coaxial</option>
+        </select></div>
       </div>
       <div class="field" id="coaxRow" hidden>
         <label for="coaxloss">Coaxial power penalty<small>Extra power vs. the same rotors on a flat frame</small></label>
@@ -141,23 +162,51 @@ td.na{color:var(--muted)}
       </div>
       <div class="field">
         <label for="frame">Empty frame weight<small>Without flight battery</small></label>
-        <div class="inwrap"><input id="frame" type="number" inputmode="decimal" min="0" step="0.1" value="8"><span class="u">kg</span></div>
+        <div class="inwrap"><input id="frame" type="number" inputmode="decimal" min="0" step="0.1" value="8"><span class="u um">kg</span></div>
       </div>
       <div class="field">
         <label for="mtow">Max take-off weight</label>
-        <div class="inwrap"><input id="mtow" type="number" inputmode="decimal" min="0" step="0.1" value="20"><span class="u">kg</span></div>
+        <div class="inwrap"><input id="mtow" type="number" inputmode="decimal" min="0" step="0.1" value="20"><span class="u um">kg</span></div>
       </div>
     </fieldset>
 
     <fieldset>
-      <legend>Tethered flight</legend>
+      <legend>Battery</legend>
       <div class="field">
-        <label for="payload">Payload weight<small>Camera, gimbal, sensors</small></label>
-        <div class="inwrap"><input id="payload" type="number" inputmode="decimal" min="0" step="0.1" value="1.5"><span class="u">kg</span></div>
+        <div class="lblwrap"><label for="cells">Battery configuration</label><span class="tip" tabindex="0" role="button" aria-label="About battery configuration">?<span class="tip-body" role="tooltip"><span>Based on a Li-Po battery: 3.7 V per cell nominal, 4.2 V per cell fully charged.</span><span>6S: 22.2 V nominal, 25.2 V full</span><span>12S: 44.4 V nominal, 50.4 V full</span><span>14S: 51.8 V nominal, 58.8 V full</span></span></span></div>
+        <div class="inwrap"><select id="cells">
+          <option value="6">6S</option>
+          <option value="12" selected>12S</option>
+          <option value="14">14S</option>
+        </select></div>
       </div>
       <div class="field">
-        <label for="backup">Backup battery weight<small>Enter 0 if none</small></label>
-        <div class="inwrap"><input id="backup" type="number" inputmode="decimal" min="0" step="0.1" value="0"><span class="u">kg</span></div>
+        <div class="lblwrap"><label for="backup">Backup battery weight</label><span class="tip" tabindex="0" role="button" aria-label="About the backup battery">?<span class="tip-body" role="tooltip"><span>A small battery on the drone that steps in when the tether can’t keep up.</span><span>It gives extra power for sudden demands, like climbing fast or holding position in strong gusts, and keeps the drone flying long enough to land safely if tether power is lost.</span></span></span><small>A backup battery is strongly recommended for safety purposes</small></div>
+        <div class="inwrap"><input id="backup" type="number" inputmode="decimal" min="0" step="0.1" value="1.5"><span class="u um">kg</span></div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Payload</legend>
+      <div class="field">
+        <label for="payload">Payload weight<small>Camera, gimbal, sensors</small></label>
+        <div class="inwrap"><input id="payload" type="number" inputmode="decimal" min="0" step="0.1" value="1.5"><span class="u um">kg</span></div>
+      </div>
+      <div class="field">
+        <div class="lblwrap"><label for="ppw">Payload power draw</label><span class="tip" tabindex="0" role="button" aria-label="About payload power draw">?<span class="tip-body" role="tooltip"><span>How much power your payload uses in normal operation.</span><span>For example, a gimbal surveillance camera uses about 30 W, and a floodlight can use 500 W.</span></span></span></div>
+        <div class="inwrap"><input id="ppw" type="number" inputmode="decimal" min="0" step="5" value="30"><span class="u">W</span></div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Ground unit</legend>
+      <div class="field">
+        <label for="vin">Input power</label>
+        <div class="inwrap"><select id="vin">
+          <option value="ac110">100–120 VAC</option>
+          <option value="ac230" selected>220–240 VAC</option>
+          <option value="dc270">270 VDC</option>
+        </select></div>
       </div>
     </fieldset>
 
@@ -169,8 +218,8 @@ td.na{color:var(--muted)}
         <div class="rangerow"><input id="tension" type="range" min="400" max="800" step="50" value="500"><output id="tensionOut" for="tension">500 g</output></div>
       </div>
       <div class="field">
-        <label for="rho">Air density<small>1.225 at 15 °C sea level, 1.16 at 30 °C</small></label>
-        <div class="inwrap"><input id="rho" type="number" inputmode="decimal" min="0.5" max="1.4" step="0.005" value="1.225"><span class="u">kg/m³</span></div>
+        <label for="rho">Air density<small id="rhoHint">1.225 at 15 °C sea level, 1.16 at 30 °C</small></label>
+        <div class="inwrap"><input id="rho" type="number" inputmode="decimal" min="0.5" max="1.4" step="0.005" value="1.225"><span class="u ur">kg/m³</span></div>
       </div>
       <div class="field">
         <label for="fm">Rotor figure of merit</label>
@@ -181,19 +230,24 @@ td.na{color:var(--muted)}
         <div class="inwrap"><input id="eta" type="number" inputmode="decimal" min="0.5" max="0.98" step="0.01" value="0.85"></div>
       </div>
       <div class="field">
-        <label for="aux">Avionics + payload power</label>
+        <label for="aux">Avionics power<small>Flight controller, radios, GPS</small></label>
         <div class="inwrap"><input id="aux" type="number" inputmode="decimal" min="0" step="5" value="30"><span class="u">W</span></div>
       </div>
       <div class="field">
-        <label for="reserve">Power reserve<small>Kept free for wind and manoeuvres</small></label>
+        <label for="reserve">Power reserve, with backup battery<small>Kept free for wind and manoeuvres</small></label>
         <div class="inwrap"><input id="reserve" type="number" inputmode="decimal" min="0" max="60" step="5" value="20"><span class="u">%</span></div>
+      </div>
+      <div class="field">
+        <label for="reserveNo">Power reserve, no backup battery<small>Used when backup battery weight is 0</small></label>
+        <div class="inwrap"><input id="reserveNo" type="number" inputmode="decimal" min="0" max="80" step="5" value="40"><span class="u">%</span></div>
       </div>
     </details>
   </form>
 
   <section aria-live="polite">
+    <h2>Recommended system</h2>
     <div class="hero">
-      <svg id="tether" viewBox="0 0 200 380" role="img" aria-label="Tether height diagram"></svg>
+      <svg id="tether" viewBox="0 22 240 254" role="img" aria-label="Tether height diagram"></svg>
       <div class="rec" id="rec"></div>
     </div>
 
@@ -210,9 +264,12 @@ td.na{color:var(--muted)}
       <summary>How it’s calculated</summary>
       <ul>
         <li>The air unit replaces the flight battery. Weight the drone holds in hover = frame + air unit + payload + backup battery + hanging cable (length × cable weight per metre) + tether tension.</li>
-        <li>Hover power uses momentum theory: <code>P = (W·g)<sup>1.5</sup> ÷ √(2ρ·N·A) ÷ (FM × η) + avionics</code>, where A is one rotor’s disc area.</li>
+        <li>Hover power uses momentum theory: <code>P = (W·g)<sup>1.5</sup> ÷ √(2ρ·N·A) ÷ (FM × η) + avionics + payload power</code>, where A is one rotor’s disc area.</li>
         <li>For coaxial frames, hover power is multiplied by the coaxial penalty (default 20%) to account for the lower rotor working in the upper rotor’s wake. The rotor count must be even.</li>
         <li>Maximum tether length is the smallest of three limits: hover power within the air unit rating minus the reserve, total weight within MTOW, and the cable length on the drum (150 m for 3 kW, 100 m for 6 kW).</li>
+        <li>Each air unit pairs with its own ground unit, which holds the tether: the 3 kW air unit with the 3 kW ground unit (150 m of tether), and the 6 kW air unit with the 6.5 kW ground unit (100 m of tether).</li>
+        <li>Power available to the drone is the lower of the air unit rating and the ground unit output. Below 180 V input (the 100–120 VAC option), the 3 kW ground unit is limited to 1.75 kW and the 6.5 kW ground unit to 3.25 kW.</li>
+        <li>The power reserve is 20% with a backup battery and 40% without one, because without a battery the drone has nothing to fall back on in a gust or a tether power loss.</li>
         <li>Height assumes the cable hangs close to vertical. Wind, drift and cable drag reduce real height and add load, so treat the result as an upper bound.</li>
         <li>When both units reach a similar height, the lighter 3 kW unit is recommended.</li>
       </ul>
@@ -224,22 +281,30 @@ td.na{color:var(--muted)}
 (function(){
   const G = 9.80665;
   const UNITS = [
-    {id:"3kW", name:"3 kW air unit", power:3000, mass:1.5, gpm:18.3, maxLen:150, cells:[6,12,14], color:"var(--steel)"},
-    {id:"6kW", name:"6 kW air unit", power:6000, mass:2.5, gpm:30,   maxLen:100, cells:[12,14],   color:"var(--amber)"}
+    {id:"3kW", name:"3 kW air unit", power:3000, mass:1.5, gpm:18.3, maxLen:150, cells:[6,12,14], groundKw:3, groundOut:{ac110:1750, ac230:3000, dc270:3000}, color:"var(--steel)"},
+    {id:"6kW", name:"6 kW air unit", power:6000, mass:2.5, gpm:30,   maxLen:100, cells:[12,14], groundKw:6.5, groundOut:{ac110:3250, ac230:6500, dc270:6500},   color:"var(--amber)"}
   ];
   const $ = id => document.getElementById(id);
   const num = id => parseFloat($(id).value);
+  const KG_LB = 2.20462, M_FT = 3.28084, RHO_C = 0.062428;
+  let IMP = false;
+  const LU = () => IMP ? "ft" : "m";
+  const len = m => IMP ? m*M_FT : m;
+  const mass = id => IMP ? num(id)/KG_LB : num(id);
   const fmt = (v,d=1) => Number.isFinite(v) ? v.toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d}) : "–";
+  const fmtLen = (m,d=0) => `${fmt(len(m),d)} ${LU()}`;
+  const fmtMass = (kg,d=2) => `${fmt(IMP?kg*KG_LB:kg,d)} ${IMP?"lb":"kg"}`;
 
   function read(){
     return {
       n: Math.round(num("n")), dIn: num("d"),
-      cells: parseInt(document.querySelector('input[name="cells"]:checked').value,10),
-      frame: num("frame"), mtow: num("mtow"), payload: num("payload"),
-      tension: num("tension")/1000, backup: num("backup"),
-      coax: document.querySelector('input[name="layout"]:checked').value === "coax",
+      cells: parseInt($("cells").value,10),
+      vin: $("vin").value,
+      frame: mass("frame"), mtow: mass("mtow"), payload: mass("payload"),
+      tension: num("tension")/1000, backup: mass("backup"),
+      coax: $("layout").value === "coax",
       coaxLoss: num("coaxloss")/100,
-      rho: num("rho"), fm: num("fm"), eta: num("eta"), aux: num("aux"), reserve: num("reserve")/100
+      rho: IMP ? num("rho")/RHO_C : num("rho"), fm: num("fm"), eta: num("eta"), aux: num("aux") + num("ppw"), ppw: num("ppw"), reserve: (num("backup")>0 ? num("reserve") : num("reserveNo"))/100
     };
   }
   function validate(p){
@@ -250,6 +315,7 @@ td.na{color:var(--muted)}
     if(!(p.mtow>0)) bad.push("max take-off weight");
     if(!(p.payload>=0)) bad.push("payload weight");
     if(!(p.backup>=0)) bad.push("backup battery weight (0 if none)");
+    if(!(p.ppw>=0)) bad.push("payload power draw");
     if(p.coax && p.n%2!==0) bad.push("number of rotors (must be even for coaxial)");
     if(p.coax && !(p.coaxLoss>=0)) bad.push("coaxial power penalty");
     if(!(p.rho>0)||!(p.fm>0)||!(p.eta>0)||!(p.aux>=0)||!(p.reserve>=0&&p.reserve<1)) bad.push("advanced configuration");
@@ -262,13 +328,15 @@ td.na{color:var(--muted)}
   }
   function evalUnit(u,p){
     if(!u.cells.includes(p.cells)) return {u, compatible:false};
-    const usable = u.power*(1-p.reserve);
+    const gW = u.groundOut[p.vin];
+    const avail = Math.min(u.power, gW);
+    const usable = avail*(1-p.reserve);
     const mech = (usable - p.aux)*p.fm*p.eta/coaxK(p);
     const wPower = mech>0 ? Math.pow(mech*Math.sqrt(2*p.rho*diskArea(p)),2/3)/G : 0;
     const fixed = p.frame + u.mass + p.payload + p.backup + p.tension;
     const w = u.gpm/1000;
     const lim = [
-      {k:"power", L:(wPower-fixed)/w, text:"air unit power"},
+      {k:"power", L:(wPower-fixed)/w, text: gW < u.power ? "ground unit output" : "air unit power"},
       {k:"mtow",  L:(p.mtow-fixed)/w, text:"max take-off weight"},
       {k:"cable", L:u.maxLen,          text:"cable length on the drum"}
     ].sort((a,b)=>a.L-b.L);
@@ -277,7 +345,8 @@ td.na{color:var(--muted)}
     const total = fixed + w*L;
     const pw = hoverPower(total,p);
     return {u, compatible:true, feasible, L, limiter:lim[0], fixed, w, total, pw, usable, wPower,
-            mtowMargin:p.mtow-total, shortKg: feasible?0:-(lim[0].L*w)};
+            avail, gW, mtowMargin:p.mtow-total, shortKg: feasible?0:-(lim[0].L*w),
+            maxPayload: Math.min(wPower,p.mtow) - (fixed - p.payload) - w*u.maxLen};
   }
   function pick(rs){
     const ok = rs.filter(r=>r.compatible&&r.feasible);
@@ -298,10 +367,13 @@ td.na{color:var(--muted)}
       el.className = "rec bad";
       const reasons = rs.map(r=>{
         if(!r.compatible) return `The ${r.u.name} does not support ${p.cells}S.`;
-        return `The ${r.u.name} is ${fmt(r.shortKg,2)} kg over its ${r.limiter.text} limit before any cable is added.`;
+        return `The ${r.u.name} is ${fmtMass(r.shortKg)} over its ${r.limiter.text} limit before any cable is added.`;
       }).join(" ");
-      el.innerHTML = `<p class="pick">No air unit fits this setup</p>
-        <div class="height">0<span class="mu">m</span></div>
+      el.innerHTML = `<div class="stats">
+          <div class="stat unit"><div class="k">Air unit</div><div class="v">None</div><div class="s">fits this setup</div></div>
+          <div class="stat unit"><div class="k">Ground unit</div><div class="v">–</div></div>
+          <div class="stat"><div class="k">Max tether length</div><div class="v">0<span class="mu">${LU()}</span></div></div>
+        </div>
         <p class="why">${reasons} Reduce the payload or tension, or use a drone with more lift.</p>`;
       return;
     }
@@ -310,36 +382,43 @@ td.na{color:var(--muted)}
     if(other){
       if(!other.compatible) otherTxt = ` The ${other.u.name} doesn’t support ${p.cells}S.`;
       else if(!other.feasible) otherTxt = ` The ${other.u.name} can’t lift this setup.`;
-      else otherTxt = ` The ${other.u.name} reaches ${fmt(other.L,0)} m.`;
+      else otherTxt = ` The ${other.u.name} reaches ${fmtLen(other.L)}.`;
     }
-    el.innerHTML = `<p class="pick">Use the ${best.u.name} at ${p.cells}S</p>
-      <div class="height cond">${fmt(best.L,0)}<span class="mu">m</span></div>
-      <p class="sub">Maximum tether length and flight height</p>
-      <p class="why">Limited by ${best.limiter.text}. Hover power at this height is ${fmt(best.pw/1000,2)} kW of the ${best.u.power/1000} kW rating.${otherTxt}</p>`;
+    el.innerHTML = `<div class="stats">
+        <div class="stat unit"><div class="k">Recommended air unit</div><div class="v">${best.u.power/1000}<span class="mu">kW</span></div></div>
+        <div class="stat unit"><div class="k">Recommended ground unit</div><div class="v">${best.u.groundKw}<span class="mu">kW</span></div></div>
+        <div class="stat"><div class="k">Max tether length</div><div class="v">${fmt(len(best.L),0)}<span class="mu">${LU()}</span></div></div>
+      </div>
+      <p class="why">Limited by ${best.limiter.text}. Hover power at this height is ${fmt(best.pw/1000,2)} kW of the ${fmt(best.avail/1000, best.avail%100 ? 2 : (best.avail%1000 ? 1 : 0))} kW available.${otherTxt}${best.gW < best.u.groundKw*1000 ? ` On 100–120 VAC the ${best.u.groundKw} kW ground unit output is limited to ${fmt(best.gW/1000,2)} kW.` : ""}</p>`;
   }
 
   function renderTether(best,rs){
-    const y = h => 340 - h/150*290;
+    const y = h => 250 - h/150*200;
     let s = `<g class="ax">`;
-    for(let h=0;h<=150;h+=25){
-      s += `<line x1="30" x2="38" y1="${y(h)}" y2="${y(h)}"/><text x="26" y="${y(h)+4}" text-anchor="end">${h}</text>`;
+    const tstep = IMP?100:25, tmax = IMP?492:150;
+    for(let v=0;v<=tmax;v+=tstep){
+      const h = IMP ? v/M_FT : v;
+      s += `<line x1="30" x2="38" y1="${y(h)}" y2="${y(h)}"/><text x="26" y="${y(h)+4}" text-anchor="end">${v}</text>`;
     }
-    s += `<line x1="38" x2="38" y1="${y(0)}" y2="${y(150)}"/><text x="26" y="${y(150)-14}" text-anchor="end">m</text></g>`;
-    rs.forEach(r=>{
-      if(!r.compatible||!r.feasible) return;
+    s += `<line x1="38" x2="38" y1="${y(0)}" y2="${y(150)}"/><text x="26" y="${y(150)-14}" text-anchor="end">${LU()}</text></g>`;
+    let lastLabelY = null;
+    rs.filter(r=>r.compatible&&r.feasible).sort((a,b)=>b.L-a.L).forEach(r=>{
       const yy = y(r.L);
-      s += `<line x1="150" x2="164" y1="${yy}" y2="${yy}" stroke="${r.u.color}" stroke-width="3"/>
-            <text x="168" y="${yy+4}" style="fill:var(--muted);font-size:11px;font-family:Barlow,system-ui,sans-serif">${r.u.id}</text>`;
+      let ly = yy-5;
+      if(lastLabelY!==null && Math.abs(ly-lastLabelY)<13) ly = yy+13;
+      lastLabelY = ly;
+      s += `<line x1="42" x2="236" y1="${yy}" y2="${yy}" stroke="${r.u.color}" stroke-width="1.5" stroke-dasharray="5 4"/>
+            <text x="236" y="${ly}" text-anchor="end" style="fill:var(--ink);font-size:11px;font-weight:600;font-family:Barlow,system-ui,sans-serif">${r.u.power/1000} kW air unit</text>`;
     });
-    s += `<line x1="40" x2="196" y1="358" y2="358" stroke="var(--line)" stroke-width="2"/>
-          <rect x="74" y="336" width="52" height="22" rx="3" fill="var(--ink)"/>
-          <rect x="82" y="342" width="18" height="4" rx="1" fill="var(--bg)"/>`;
+    s += `<line x1="40" x2="236" y1="268" y2="268" stroke="var(--line)" stroke-width="2"/>
+          <rect x="74" y="246" width="52" height="22" rx="3" fill="var(--ink)"/>
+          <rect x="82" y="252" width="18" height="4" rx="1" fill="var(--bg)"/>`;
     const L = best ? best.L : 0;
     const yd = y(L);
     if(best){
-      s += `<line id="cable" x1="100" y1="336" x2="100" y2="${yd+6}" stroke="var(--amber)" stroke-width="2.5"/>`;
+      s += `<line id="cable" x1="100" y1="246" x2="100" y2="${yd+6}" stroke="var(--cable)" stroke-width="2.5"/>`;
     }
-    const dy = best ? yd : 322;
+    const dy = best ? yd : 232;
     s += `<g id="drone" style="transform:translateY(${dy}px)">
             <line x1="70" x2="130" y1="0" y2="0" stroke="var(--ink)" stroke-width="3"/>
             <rect x="90" y="-5" width="20" height="11" rx="2" fill="var(--ink)"/>
@@ -350,20 +429,19 @@ td.na{color:var(--muted)}
   }
 
   function renderTable(best,rs,p){
-    const head = `<thead><tr><th></th>${rs.map(r=>`<th>${r.u.name}${r===best?'<span class="tag best">Recommended</span>':''}</th>`).join("")}</tr></thead>`;
+    const head = `<thead><tr><th></th>${rs.map(r=>`<th>${r.u.name}${r===best?'<span class="tag best">Recommended</span>':''}<span class="thsub">with ${r.u.groundKw} kW ground unit</span></th>`).join("")}</tr></thead>`;
     const row = (label,fn) => `<tr><th scope="row">${label}</th>${rs.map(r=>{
       if(!r.compatible) return `<td class="na">–</td>`;
       return `<td>${fn(r)}</td>`;
     }).join("")}</tr>`;
     const body = `<tbody>
       <tr><th scope="row">${p.cells}S support</th>${rs.map(r=>r.compatible?`<td>Yes</td>`:`<td class="warn">No (${r.u.cells.map(c=>c+"S").join(", ")} only)</td>`).join("")}</tr>
-      ${row("Max tether length", r=>r.feasible?`${fmt(r.L,0)} m`:`<span class="warn">Can’t lift</span>`)}
-      ${row("Limited by", r=>r.limiter.text.charAt(0).toUpperCase()+r.limiter.text.slice(1))}
-      ${row("Weight before cable", r=>`${fmt(r.fixed,2)} kg`)}
-      ${row("Cable weight at max length", r=>`${fmt(r.w*r.L,2)} kg`)}
-      ${row("Total hover weight", r=>`${fmt(r.total,2)} kg <span class="tag">${fmt(r.mtowMargin,2)} kg to MTOW</span>`)}
-      ${row("Hover power", r=>`${fmt(r.pw,0)} W <span class="tag">${fmt(r.pw/r.u.power*100,0)}% of rating</span>`)}
-      ${row("Max weight power can hold", r=>`${fmt(r.wPower,1)} kg`)}
+      ${row("Max tether length", r=>r.feasible?`${fmtLen(r.L)}`:`<span class="warn">Can’t lift</span>`)}
+      ${row("Max payload capacity at full cable length", r=>r.maxPayload>0?`${fmtMass(r.maxPayload)} <span class="tag">at ${fmtLen(r.u.maxLen)}</span>`:`<span class="warn">None at ${fmtLen(r.u.maxLen)}</span>`)}
+      ${row("Total hover weight", r=>`${fmtMass(r.total)} <span class="tag">${fmtMass(r.mtowMargin)} to MTOW</span>`)}
+      ${row("Power available", r=>`${fmt(r.avail,0)} W${r.avail < r.u.power ? ' <span class="tag">limited by ground unit</span>' : ''}`)}
+      ${row("Hover power", r=>`${fmt(r.pw,0)} W <span class="tag">${fmt(r.pw/r.avail*100,0)}% of available</span>`)}
+      ${row("Power reserve applied", r=>`${fmt(p.reserve*100,0)}% <span class="tag">${p.backup>0?"with backup battery":"no backup battery"}</span>`)}
     </tbody>`;
     $("cmp").innerHTML = head + body;
   }
@@ -381,10 +459,11 @@ td.na{color:var(--muted)}
     for(let v=0;v<=yMax;v+=step){
       s += `<line x1="${l}" x2="${W-r}" y1="${ys(v)}" y2="${ys(v)}"/><text x="${l-8}" y="${ys(v)+4}" text-anchor="end">${v/1000} kW</text>`;
     }
-    for(let L=0;L<=150;L+=25){
-      s += `<text x="${xs(L)}" y="${H-b+18}" text-anchor="middle">${L} m</text>`;
+    for(let v=0;v<=(IMP?492:150);v+=(IMP?100:25)){
+      const L = IMP ? v/M_FT : v;
+      s += `<text x="${xs(L)}" y="${H-b+18}" text-anchor="middle">${v} ${LU()}</text>`;
     }
-    s += `<text x="${(l+W-r)/2}" y="${H-4}" text-anchor="middle">Tether length</text></g>`;
+    s += `<text x="${(l+W-r)/2}" y="${H-4}" text-anchor="middle">Tether length</text><text transform="translate(12 ${(t+H-b)/2}) rotate(-90)" text-anchor="middle">Power draw</text></g>`;
     let leg = "";
     live.forEach(x=>{
       let okPts=[], overPts=[];
@@ -399,16 +478,17 @@ td.na{color:var(--muted)}
       if(x.feasible){
         s += `<circle cx="${xs(x.L)}" cy="${ys(x.pw)}" r="5" fill="var(--surface)" stroke="${x.u.color}" stroke-width="2.5"/>`;
       }
-      leg += `<span><i style="border-color:${x.u.color}"></i>${x.u.id} hover power</span><span><i class="d" style="border-color:${x.u.color}"></i>${x.u.id} usable power (${fmt(x.usable,0)} W)</span>`;
+      leg += `<span><i style="border-color:${x.u.color}"></i>Hover power draw with ${x.u.id} air unit</span><span><i class="d" style="border-color:${x.u.color}"></i>Usable power with ${x.u.id} air unit (${fmt(x.usable,0)} W)</span>`;
     });
-    if(live.length) leg += `<span>Faded line: over MTOW. Circle: max tether length.</span>`;
+    if(live.length) leg += `<span class="lbreak"></span><span><i class="faded"></i>Faded line: over MTOW</span><span><b class="c"></b>Circle: max tether length</span>`;
     $("chart").innerHTML = s;
     $("legend").innerHTML = leg;
   }
 
   function update(){
-    $("tensionOut").textContent = $("tension").value + " g";
-    $("coaxRow").hidden = document.querySelector('input[name="layout"]:checked').value !== "coax";
+    const tg = +$("tension").value;
+    $("tensionOut").textContent = IMP ? fmt(tg/28.3495,1) + " oz" : tg + " g";
+    $("coaxRow").hidden = $("layout").value !== "coax";
     const p = read();
     const errors = validate(p);
     const rs = errors.length ? UNITS.map(u=>({u,compatible:false})) : UNITS.map(u=>evalUnit(u,p));
@@ -417,6 +497,23 @@ td.na{color:var(--muted)}
     renderTether(best,rs);
     if(!errors.length){ renderTable(best,rs,p); renderChart(best,rs,p); }
   }
+  function setUnits(imp){
+    if(imp===IMP) return;
+    const f = imp ? KG_LB : 1/KG_LB;
+    ["frame","mtow","payload","backup"].forEach(id=>{
+      const v = num(id);
+      if(Number.isFinite(v)) $(id).value = +(v*f).toFixed(2);
+    });
+    const r = num("rho");
+    if(Number.isFinite(r)) $("rho").value = imp ? +(r*RHO_C).toFixed(4) : +(r/RHO_C).toFixed(3);
+    $("rho").step = imp ? "0.0005" : "0.005";
+    IMP = imp;
+    document.querySelectorAll(".um").forEach(e=>e.textContent = imp ? "lb" : "kg");
+    document.querySelectorAll(".ur").forEach(e=>e.textContent = imp ? "lb/ft³" : "kg/m³");
+    $("rhoHint").textContent = imp ? "0.0765 at 59 °F sea level, 0.0724 at 86 °F" : "1.225 at 15 °C sea level, 1.16 at 30 °C";
+    update();
+  }
+  document.querySelectorAll('input[name="units"]').forEach(e=>e.addEventListener("change",()=>setUnits(e.value==="imperial")));
   $("f").addEventListener("input", update);
   update();
 })();
