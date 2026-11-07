@@ -33,7 +33,12 @@ html{scroll-padding-top:env(safe-area-inset-top,0px)}
 body{margin:0;background:var(--bg);color:var(--ink);
   font-family:"Barlow",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:17px;line-height:1.5}
 .cond{font-family:"Barlow Semi Condensed","Barlow",system-ui,sans-serif}
-header.top{max-width:1180px;margin:0 auto;padding:28px 20px 20px}
+header.top{max-width:1180px;margin:0 auto;padding:28px 20px 20px;position:relative}
+header.top h1{padding-right:52px}
+.themebtn{position:absolute;top:28px;right:20px;width:30px;height:30px;padding:0;border-radius:7px;border:1px solid var(--line);background:var(--surface);color:var(--ink);display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
+.themebtn:hover{border-color:var(--steel);color:var(--steel)}
+.themebtn:focus-visible{outline:2px solid var(--steel);outline-offset:2px}
+.themebtn svg{width:16px;height:16px}
 #f{position:relative}
 .unitseg{display:flex;width:140px;position:absolute;top:5px;right:0;z-index:2;font-size:.8rem}
 .unitseg label{flex:1}
@@ -81,8 +86,8 @@ details.assume p{color:var(--muted);font-size:.9rem;margin:6px 0 4px}
 
 /* results */
 .hero{display:grid;grid-template-columns:220px minmax(0,1fr);gap:24px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px 22px}
-@media (max-width:520px){.hero{grid-template-columns:130px minmax(0,1fr);gap:14px;padding:16px}}
-.hero svg{width:100%;height:auto;display:block}
+@media (max-width:520px){.hero svg{max-width:240px;justify-self:center}.hero{grid-template-columns:minmax(0,1fr);gap:14px;padding:16px}}
+.hero svg{width:100%;height:auto;display:block;align-self:center}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--cable:#8E979D}}
 :root[data-theme="dark"]{--cable:#8E979D}
 section > h2:first-child{margin-top:0}
@@ -97,7 +102,7 @@ section > h2:first-child{margin-top:0}
 .stat .s{color:var(--muted);font-size:.95rem}
 .rec .why{margin:auto 0 0;padding-top:12px;border-top:1px solid var(--line);color:var(--muted);font-size:.9rem;max-width:60ch}
 .rec.bad .stat .v{color:var(--bad)}
-@media (max-width:520px){.stat .v{font-size:2.3rem}.stat .v .mu{font-size:1.2rem}.stats{gap:10px}}
+@media (max-width:520px){.stat .v{font-size:2rem}.stat .v .mu{font-size:1.1rem}.stats{gap:10px;grid-template-columns:repeat(3,minmax(0,1fr))}.stat .k{font-size:.72rem}}
 h2{font-family:"Barlow Semi Condensed","Barlow",system-ui,sans-serif;font-weight:600;font-size:1.25rem;margin:30px 0 10px}
 .tablewrap{overflow-x:auto}
 table{border-collapse:collapse;width:100%;min-width:460px;font-variant-numeric:tabular-nums}
@@ -105,6 +110,7 @@ th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);verti
 thead th{font-family:"Barlow Semi Condensed","Barlow",system-ui,sans-serif;font-weight:600;font-size:1.05rem;border-bottom:2px solid var(--ink)}
 tbody th{font-weight:500;color:var(--muted);width:38%}
 td.na{color:var(--muted)}
+.disclaimer{margin:10px 2px 0;font-size:.82rem;line-height:1.45;color:var(--muted)}
 .thsub{display:block;font-family:"Barlow",system-ui,sans-serif;font-weight:500;font-size:.88rem;color:var(--muted)}
 .tag{display:inline-block;font-size:.8rem;font-weight:600;padding:1px 8px;border-radius:20px;background:var(--chip);margin-left:6px;vertical-align:2px}
 .tag.best{background:var(--ink);color:var(--bg)}
@@ -126,9 +132,13 @@ td.na{color:var(--muted)}
   #drone,#cable{transition:transform .35s ease, y2 .35s ease}
 }
 </style>
+<script>
+try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t);}catch(e){}
+</script>
 </head>
 <body>
 <header class="top">
+  <button type="button" id="themeBtn" class="themebtn" aria-label="Switch theme"></button>
   <h1>Volarious Tethered Flight Calculator</h1>
   <p>Enter the drone’s specs and the payload you want to carry. The calculator picks the air unit and the longest tether the drone can hold in hover.</p>
 </header>
@@ -250,6 +260,7 @@ td.na{color:var(--muted)}
       <svg id="tether" viewBox="0 22 240 254" role="img" aria-label="Tether height diagram"></svg>
       <div class="rec" id="rec"></div>
     </div>
+    <p class="disclaimer">This calculator gives an estimate only. We can’t guarantee that your drone will fly with this setup, because real-world performance depends on many more factors. Please consult Volarious for advice on your setup.</p>
 
     <h2>Air unit comparison</h2>
     <div class="tablewrap"><table id="cmp"></table></div>
@@ -395,8 +406,8 @@ td.na{color:var(--muted)}
   function renderTether(best,rs){
     const y = h => 250 - h/150*200;
     let s = `<g class="ax">`;
-    const tstep = IMP?100:25, tmax = IMP?492:150;
-    for(let v=0;v<=tmax;v+=tstep){
+    const ticks = IMP ? [0,100,200,300,400,492] : [0,25,50,75,100,125,150];
+    for(const v of ticks){
       const h = IMP ? v/M_FT : v;
       s += `<line x1="30" x2="38" y1="${y(h)}" y2="${y(h)}"/><text x="26" y="${y(h)+4}" text-anchor="end">${v}</text>`;
     }
@@ -459,7 +470,7 @@ td.na{color:var(--muted)}
     for(let v=0;v<=yMax;v+=step){
       s += `<line x1="${l}" x2="${W-r}" y1="${ys(v)}" y2="${ys(v)}"/><text x="${l-8}" y="${ys(v)+4}" text-anchor="end">${v/1000} kW</text>`;
     }
-    for(let v=0;v<=(IMP?492:150);v+=(IMP?100:25)){
+    for(const v of (IMP ? [0,100,200,300,400,492] : [0,25,50,75,100,125,150])){
       const L = IMP ? v/M_FT : v;
       s += `<text x="${xs(L)}" y="${H-b+18}" text-anchor="middle">${v} ${LU()}</text>`;
     }
@@ -514,6 +525,23 @@ td.na{color:var(--muted)}
     update();
   }
   document.querySelectorAll('input[name="units"]').forEach(e=>e.addEventListener("change",()=>setUnits(e.value==="imperial")));
+  const SUN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg>';
+  const MOON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11z"/></svg>';
+  const mq = window.matchMedia("(prefers-color-scheme: dark)");
+  const effTheme = () => document.documentElement.getAttribute("data-theme") || (mq.matches ? "dark" : "light");
+  function paintThemeBtn(){
+    const dark = effTheme() === "dark";
+    $("themeBtn").innerHTML = dark ? SUN : MOON;
+    $("themeBtn").setAttribute("aria-label", dark ? "Switch to light theme" : "Switch to dark theme");
+  }
+  $("themeBtn").addEventListener("click", ()=>{
+    const next = effTheme() === "dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", next);
+    try{ localStorage.setItem("theme", next); }catch(e){}
+    paintThemeBtn();
+  });
+  if(mq.addEventListener) mq.addEventListener("change", paintThemeBtn);
+  paintThemeBtn();
   $("f").addEventListener("input", update);
   update();
 })();
