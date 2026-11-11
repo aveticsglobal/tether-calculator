@@ -27,6 +27,9 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:"Barlow",system-
 .brand{font-family:"Barlow Semi Condensed","Barlow",system-ui,sans-serif;font-weight:700;font-size:.85rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 12px}
 .bar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 12px}
 .bar .brand{margin:0}
+.pagetitle{font-family:"Barlow Semi Condensed","Barlow",system-ui,sans-serif;font-weight:700;font-size:clamp(1.8rem,4vw,2.4rem);line-height:1.1;margin:0 0 8px}
+.intro{margin:0 0 20px;color:var(--muted);font-size:1.05rem;line-height:1.5;max-width:66ch}
+.ask{margin:0 0 10px;font-weight:600;font-size:1rem}
 .themebtn{width:34px;height:34px;padding:0;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;flex:none}
 .themebtn:hover{border-color:var(--muted)}
 .themebtn svg{width:17px;height:17px}
@@ -45,7 +48,10 @@ iframe[hidden]{display:none}
 </head>
 <body>
 <nav class="nav" aria-label="Tools">
-  <div class="bar"><p class="brand">Volarious tether tools</p><button type="button" id="themeBtn" class="themebtn" aria-label="Switch theme"></button></div>
+  <div class="bar"><p class="brand">Volarious</p><button type="button" id="themeBtn" class="themebtn" aria-label="Switch theme"></button></div>
+  <h1 class="pagetitle">Tether system tools</h1>
+  <p class="intro">Planning to fly your drone on a Volarious tether? These two tools help you pick the right system and work out how it connects to your drone.</p>
+  <p class="ask">What would you like to do?</p>
   <div class="tabs">
     <a href="#calculator" id="tab-calculator"><span class="t">Help me choose the right tether system</span><span class="d">Tether System Selector: find the right air-side and ground unit, and how high your drone can fly.</span></a>
     <a href="#planner" id="tab-planner"><span class="t">Help me integrate the air-side unit to my drone</span><span class="d">Electrical Integration Planner: see how the air-side unit connects to your drone’s batteries.</span></a>
