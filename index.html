@@ -3,11 +3,64 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Volarious Tethered Flight Calculator</title>
+<title>Volarious Tether Tools</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Semi+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
+<script>
+try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t);}catch(e){}
+</script>
 <style>
+:root{
+  --bg:#E9EEF1; --surface:#F7F9FA; --ink:#17232B; --muted:#56666F; --line:#C9D3D9; --amber:#D09400;
+  color-scheme:light; box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){ --bg:#10181E; --surface:#18232B; --ink:#E4ECF0; --muted:#97A8B3; --line:#2C3B45; --amber:#F2B705; color-scheme:dark; }
+}
+:root[data-theme="dark"]{ --bg:#10181E; --surface:#18232B; --ink:#E4ECF0; --muted:#97A8B3; --line:#2C3B45; --amber:#F2B705; color-scheme:dark; }
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Barlow",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.nav{max-width:1180px;margin:0 auto;padding:20px 20px 0}
+.brand{font-family:"Barlow Semi Condensed","Barlow",system-ui,sans-serif;font-weight:700;font-size:.85rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 12px}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 12px}
+.bar .brand{margin:0}
+.themebtn{width:34px;height:34px;padding:0;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;flex:none}
+.themebtn:hover{border-color:var(--muted)}
+.themebtn svg{width:17px;height:17px}
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:620px){.tabs{grid-template-columns:1fr}}
+.tabs a{display:block;text-decoration:none;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;border-top:4px solid var(--line)}
+.tabs a:hover{border-color:var(--muted)}
+.tabs a[aria-current="page"]{border-top-color:var(--amber);box-shadow:0 1px 0 var(--line)}
+.tabs .n{font-family:"Barlow Semi Condensed","Barlow",system-ui,sans-serif;font-weight:700;font-size:.8rem;color:var(--muted)}
+.tabs .t{display:block;font-family:"Barlow Semi Condensed","Barlow",system-ui,sans-serif;font-weight:700;font-size:1.2rem;margin:2px 0}
+.tabs .d{display:block;font-size:.9rem;color:var(--muted)}
+:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+iframe{display:block;width:100%;border:0;height:100vh;background:transparent}
+iframe[hidden]{display:none}
+</style>
+</head>
+<body>
+<nav class="nav" aria-label="Tools">
+  <div class="bar"><p class="brand">Volarious tether tools</p><button type="button" id="themeBtn" class="themebtn" aria-label="Switch theme"></button></div>
+  <div class="tabs">
+    <a href="#calculator" id="tab-calculator"><span class="t">Help me choose the right tether system</span><span class="d">Tether System Selector: find the right air-side and ground unit, and how high your drone can fly.</span></a>
+    <a href="#planner" id="tab-planner"><span class="t">Help me integrate the air-side unit to my drone</span><span class="d">Electrical Integration Planner: see how the air-side unit connects to your drone’s batteries.</span></a>
+  </div>
+</nav>
+<iframe id="f-calculator" title="Tether System Selector" srcdoc="&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;utf-8&quot;&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1, viewport-fit=cover&quot;&gt;
+&lt;title&gt;Tether System Selector&lt;/title&gt;
+&lt;link rel=&quot;preconnect&quot; href=&quot;https://fonts.googleapis.com&quot;&gt;
+&lt;link rel=&quot;preconnect&quot; href=&quot;https://fonts.gstatic.com&quot; crossorigin&gt;
+&lt;link href=&quot;https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&amp;family=Barlow+Semi+Condensed:wght@500;600;700&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;
+&lt;style&gt;
 :root{
   --bg:#E9EEF1; --surface:#F7F9FA; --ink:#17232B; --muted:#56666F; --line:#C9D3D9;
   --amber:#D09400; --steel:#2E5B78; --cable:#454B50; --bad:#A8352A; --good:#2B7148; --chip:#DDE5EA;
@@ -17,13 +70,13 @@
   padding-bottom:env(safe-area-inset-bottom,0px);
 }
 @media (prefers-color-scheme:dark){
-  :root:not([data-theme="light"]){
+  :root:not([data-theme=&quot;light&quot;]){
     --bg:#10181E; --surface:#18232B; --ink:#E4ECF0; --muted:#97A8B3; --line:#2C3B45;
     --amber:#F2B705; --steel:#7AAFD2; --bad:#E57367; --good:#62C08A; --chip:#22313B;
     color-scheme:dark;
   }
 }
-:root[data-theme="dark"]{
+:root[data-theme=&quot;dark&quot;]{
   --bg:#10181E; --surface:#18232B; --ink:#E4ECF0; --muted:#97A8B3; --line:#2C3B45;
   --amber:#F2B705; --steel:#7AAFD2; --bad:#E57367; --good:#62C08A; --chip:#22313B;
   color-scheme:dark;
@@ -31,26 +84,27 @@
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *,*::before,*::after{box-sizing:inherit}
 body{margin:0;background:var(--bg);color:var(--ink);
-  font-family:"Barlow",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:17px;line-height:1.5}
-.cond{font-family:"Barlow Semi Condensed","Barlow",system-ui,sans-serif}
+  font-family:&quot;Barlow&quot;,system-ui,-apple-system,&quot;Segoe UI&quot;,Roboto,sans-serif;font-size:17px;line-height:1.5}
+.cond{font-family:&quot;Barlow Semi Condensed&quot;,&quot;Barlow&quot;,system-ui,sans-serif}
 header.top{max-width:1180px;margin:0 auto;padding:28px 20px 20px;position:relative}
 header.top h1{padding-right:52px}
 .themebtn{position:absolute;top:28px;right:20px;width:30px;height:30px;padding:0;border-radius:7px;border:1px solid var(--line);background:var(--surface);color:var(--ink);display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
 .themebtn:hover{border-color:var(--steel);color:var(--steel)}
 .themebtn:focus-visible{outline:2px solid var(--steel);outline-offset:2px}
 .themebtn svg{width:16px;height:16px}
+.embedded .themebtn{display:none}
 #f{position:relative}
 .unitseg{display:flex;width:140px;position:absolute;top:5px;right:0;z-index:2;font-size:.8rem}
 .unitseg label{flex:1}
 .seg.unitseg span{padding:0;line-height:18px}
-header.top h1{font-family:"Barlow Semi Condensed","Barlow",system-ui,sans-serif;font-weight:700;font-size:2.1rem;line-height:1.1;margin:0 0 6px}
+header.top h1{font-family:&quot;Barlow Semi Condensed&quot;,&quot;Barlow&quot;,system-ui,sans-serif;font-weight:700;font-size:2.1rem;line-height:1.1;margin:0 0 6px}
 header.top p{margin:0;color:var(--muted);max-width:62ch}
 .layout{display:grid;grid-template-columns:minmax(300px,380px) minmax(0,1fr);gap:32px;max-width:1180px;margin:0 auto;padding:0 20px 56px;align-items:start}
 @media (max-width:880px){.layout{grid-template-columns:minmax(0,1fr)}}
 
 /* inputs */
 fieldset{border:0;margin:0 0 22px;padding:0}
-legend{font-family:"Barlow Semi Condensed","Barlow",system-ui,sans-serif;font-weight:600;font-size:1.15rem;padding:0;margin-bottom:4px}
+legend{font-family:&quot;Barlow Semi Condensed&quot;,&quot;Barlow&quot;,system-ui,sans-serif;font-weight:600;font-size:1.15rem;padding:0;margin-bottom:4px}
 .field{display:grid;grid-template-columns:1fr 140px;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--line)}
 .field.wide{grid-template-columns:1fr}
 .field[hidden]{display:none}
@@ -58,8 +112,8 @@ legend{font-family:"Barlow Semi Condensed","Barlow",system-ui,sans-serif;font-we
 .tip{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;margin-left:6px;border-radius:50%;border:1.5px solid var(--muted);color:var(--muted);font-size:.72rem;font-weight:600;line-height:1;cursor:help;vertical-align:1px}
 .tip:hover,.tip:focus{border-color:var(--steel);color:var(--steel);outline:none}
 .tip-body{position:absolute;left:0;top:calc(100% + 6px);z-index:20;width:max-content;max-width:min(290px,80vw);padding:10px 12px;border-radius:8px;background:var(--ink);color:var(--bg);font-size:.86rem;font-weight:400;line-height:1.4;text-align:left;box-shadow:0 6px 18px rgba(0,0,0,.2);opacity:0;visibility:hidden;transition:opacity .12s;pointer-events:none}
-.tip-body>span{display:block}
-.tip-body>span+span{margin-top:4px}
+.tip-body&gt;span{display:block}
+.tip-body&gt;span+span{margin-top:4px}
 .tip:hover .tip-body,.tip:focus .tip-body{opacity:1;visibility:visible}
 .field label,.field .lbl{font-weight:500}
 .field small{display:block;color:var(--muted);font-size:.85rem;font-weight:400;line-height:1.3}
@@ -88,35 +142,40 @@ details.assume p{color:var(--muted);font-size:.9rem;margin:6px 0 4px}
 .hero{display:grid;grid-template-columns:220px minmax(0,1fr);gap:24px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px 22px}
 @media (max-width:520px){.hero svg{max-width:240px;justify-self:center}.hero{grid-template-columns:minmax(0,1fr);gap:14px;padding:16px}}
 .hero svg{width:100%;height:auto;display:block;align-self:center}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--cable:#8E979D}}
-:root[data-theme="dark"]{--cable:#8E979D}
-section > h2:first-child{margin-top:0}
+@media (prefers-color-scheme:dark){:root:not([data-theme=&quot;light&quot;]){--cable:#8E979D}}
+:root[data-theme=&quot;dark&quot;]{--cable:#8E979D}
+section &gt; h2:first-child{margin-top:0}
 .rec{display:flex;flex-direction:column;gap:16px;min-width:0}
-.rec .pick{font-family:"Barlow Semi Condensed","Barlow",system-ui,sans-serif;font-weight:600;font-size:1.25rem;margin:0}
+.rec .pick{font-family:&quot;Barlow Semi Condensed&quot;,&quot;Barlow&quot;,system-ui,sans-serif;font-weight:600;font-size:1.25rem;margin:0}
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:16px 18px;flex:1;align-content:center}
 .stat{min-width:0}
 .stat .k{font-size:.8rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
-.stat .v{font-family:"Barlow Semi Condensed","Barlow",system-ui,sans-serif;font-weight:700;font-size:2.8rem;line-height:1.05;margin-top:4px;white-space:nowrap}
+.stat .v{font-family:&quot;Barlow Semi Condensed&quot;,&quot;Barlow&quot;,system-ui,sans-serif;font-weight:700;font-size:2.8rem;line-height:1.05;margin-top:4px;white-space:nowrap}
 .stat .v .mu{font-size:1.6rem;font-weight:600;margin-left:4px}
 .stat.unit .v{color:var(--steel)}
 .stat .s{color:var(--muted);font-size:.95rem}
+.planbtn{display:none;margin:18px 0 0;align-self:flex-start;font:inherit;font-weight:600;font-size:.95rem;border:0;border-radius:8px;padding:15px 22px;background:var(--ink);color:var(--surface);cursor:pointer}
+.planbtn:hover{opacity:.9}
+.embedded .planbtn{display:block;margin-left:auto;margin-right:auto}
+.embedded .planbtn[hidden]{display:none}
+.embedded .planbtn+h2{margin-top:18px}
 .rec .why{margin:auto 0 0;padding-top:12px;border-top:1px solid var(--line);color:var(--muted);font-size:.9rem;max-width:60ch}
 .rec.bad .stat .v{color:var(--bad)}
 @media (max-width:520px){.stat .v{font-size:2rem}.stat .v .mu{font-size:1.1rem}.stats{gap:10px;grid-template-columns:repeat(3,minmax(0,1fr))}.stat .k{font-size:.72rem}}
-h2{font-family:"Barlow Semi Condensed","Barlow",system-ui,sans-serif;font-weight:600;font-size:1.25rem;margin:30px 0 10px}
+h2{font-family:&quot;Barlow Semi Condensed&quot;,&quot;Barlow&quot;,system-ui,sans-serif;font-weight:600;font-size:1.25rem;margin:30px 0 10px}
 .tablewrap{overflow-x:auto}
 table{border-collapse:collapse;width:100%;min-width:460px;font-variant-numeric:tabular-nums}
 th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
-thead th{font-family:"Barlow Semi Condensed","Barlow",system-ui,sans-serif;font-weight:600;font-size:1.05rem;border-bottom:2px solid var(--ink)}
+thead th{font-family:&quot;Barlow Semi Condensed&quot;,&quot;Barlow&quot;,system-ui,sans-serif;font-weight:600;font-size:1.05rem;border-bottom:2px solid var(--ink)}
 tbody th{font-weight:500;color:var(--muted);width:38%}
 td.na{color:var(--muted)}
 .disclaimer{margin:10px 2px 0;font-size:.82rem;line-height:1.45;color:var(--muted)}
-.thsub{display:block;font-family:"Barlow",system-ui,sans-serif;font-weight:500;font-size:.88rem;color:var(--muted)}
+.thsub{display:block;font-family:&quot;Barlow&quot;,system-ui,sans-serif;font-weight:500;font-size:.88rem;color:var(--muted)}
 .tag{display:inline-block;font-size:.8rem;font-weight:600;padding:1px 8px;border-radius:20px;background:var(--chip);margin-left:6px;vertical-align:2px}
 .tag.best{background:var(--ink);color:var(--bg)}
 .chartwrap{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 12px 8px;overflow-x:auto}
 .chartwrap svg{display:block;width:100%;min-width:480px;height:auto}
-.ax text{fill:var(--muted);font-size:11px;font-family:"Barlow",system-ui,sans-serif}
+.ax text{fill:var(--muted);font-size:11px;font-family:&quot;Barlow&quot;,system-ui,sans-serif}
 .ax line{stroke:var(--line)}
 .legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:.88rem;color:var(--muted);padding:6px 6px 4px}
 .legend i{display:inline-block;width:18px;height:0;border-top:3px solid;vertical-align:4px;margin-right:6px}
@@ -131,205 +190,206 @@ td.na{color:var(--muted)}
 @media (prefers-reduced-motion:no-preference){
   #drone,#cable{transition:transform .35s ease, y2 .35s ease}
 }
-</style>
-<script>
-try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t);}catch(e){}
-</script>
-</head>
-<body>
-<header class="top">
-  <button type="button" id="themeBtn" class="themebtn" aria-label="Switch theme"></button>
-  <h1>Volarious Tethered Flight Calculator</h1>
-  <p>Enter the drone’s specs and the payload you want to carry. The calculator picks the air unit and the longest tether the drone can hold in hover.</p>
-</header>
+&lt;/style&gt;
+&lt;script&gt;
+try{var t=localStorage.getItem(&quot;theme&quot;);if(t===&quot;light&quot;||t===&quot;dark&quot;)document.documentElement.setAttribute(&quot;data-theme&quot;,t);}catch(e){}
+&lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;header class=&quot;top&quot;&gt;
+  &lt;button type=&quot;button&quot; id=&quot;themeBtn&quot; class=&quot;themebtn&quot; aria-label=&quot;Switch theme&quot;&gt;&lt;/button&gt;
+  &lt;h1&gt;Tether System Selector&lt;/h1&gt;
+  &lt;p&gt;Enter the drone’s specs and the payload you want to carry. The calculator picks the air unit and the longest tether the drone can hold in hover.&lt;/p&gt;
+&lt;/header&gt;
 
-<main class="layout">
-  <form id="f" onsubmit="return false" novalidate>
-    <div class="seg unitseg" role="radiogroup" aria-label="Units">
-      <label><input type="radio" name="units" value="metric" checked><span>Metric</span></label>
-      <label><input type="radio" name="units" value="imperial"><span>Imperial</span></label>
-    </div>
-    <fieldset>
-      <legend>Drone</legend>
-      <div class="field">
-        <label for="n">Number of rotors<small>Count every motor, e.g. 8 for an X8</small></label>
-        <div class="inwrap"><input id="n" type="number" inputmode="numeric" min="3" max="16" step="1" value="6"><span class="u">rotors</span></div>
-      </div>
-      <div class="field">
-        <label for="d">Rotor size</label>
-        <div class="inwrap"><input id="d" type="number" inputmode="decimal" min="5" max="60" step="0.5" value="22"><span class="u">in</span></div>
-      </div>
-      <div class="field">
-        <label for="layout">Frame layout</label>
-        <div class="inwrap"><select id="layout">
-          <option value="flat" selected>Flat</option>
-          <option value="coax">Coaxial</option>
-        </select></div>
-      </div>
-      <div class="field" id="coaxRow" hidden>
-        <label for="coaxloss">Coaxial power penalty<small>Extra power vs. the same rotors on a flat frame</small></label>
-        <div class="inwrap"><input id="coaxloss" type="number" inputmode="decimal" min="0" max="60" step="1" value="20"><span class="u">%</span></div>
-      </div>
-      <div class="field">
-        <label for="frame">Empty frame weight<small>Without flight battery</small></label>
-        <div class="inwrap"><input id="frame" type="number" inputmode="decimal" min="0" step="0.1" value="8"><span class="u um">kg</span></div>
-      </div>
-      <div class="field">
-        <label for="mtow">Max take-off weight</label>
-        <div class="inwrap"><input id="mtow" type="number" inputmode="decimal" min="0" step="0.1" value="20"><span class="u um">kg</span></div>
-      </div>
-    </fieldset>
+&lt;main class=&quot;layout&quot;&gt;
+  &lt;form id=&quot;f&quot; onsubmit=&quot;return false&quot; novalidate&gt;
+    &lt;div class=&quot;seg unitseg&quot; role=&quot;radiogroup&quot; aria-label=&quot;Units&quot;&gt;
+      &lt;label&gt;&lt;input type=&quot;radio&quot; name=&quot;units&quot; value=&quot;metric&quot; checked&gt;&lt;span&gt;Metric&lt;/span&gt;&lt;/label&gt;
+      &lt;label&gt;&lt;input type=&quot;radio&quot; name=&quot;units&quot; value=&quot;imperial&quot;&gt;&lt;span&gt;Imperial&lt;/span&gt;&lt;/label&gt;
+    &lt;/div&gt;
+    &lt;fieldset&gt;
+      &lt;legend&gt;Drone&lt;/legend&gt;
+      &lt;div class=&quot;field&quot;&gt;
+        &lt;label for=&quot;n&quot;&gt;Number of rotors&lt;small&gt;Count every motor, e.g. 8 for an X8&lt;/small&gt;&lt;/label&gt;
+        &lt;div class=&quot;inwrap&quot;&gt;&lt;input id=&quot;n&quot; type=&quot;number&quot; inputmode=&quot;numeric&quot; min=&quot;3&quot; max=&quot;16&quot; step=&quot;1&quot; value=&quot;6&quot;&gt;&lt;span class=&quot;u&quot;&gt;rotors&lt;/span&gt;&lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;field&quot;&gt;
+        &lt;label for=&quot;d&quot;&gt;Rotor size&lt;/label&gt;
+        &lt;div class=&quot;inwrap&quot;&gt;&lt;input id=&quot;d&quot; type=&quot;number&quot; inputmode=&quot;decimal&quot; min=&quot;5&quot; max=&quot;60&quot; step=&quot;0.5&quot; value=&quot;22&quot;&gt;&lt;span class=&quot;u&quot;&gt;in&lt;/span&gt;&lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;field&quot;&gt;
+        &lt;label for=&quot;layout&quot;&gt;Frame layout&lt;/label&gt;
+        &lt;div class=&quot;inwrap&quot;&gt;&lt;select id=&quot;layout&quot;&gt;
+          &lt;option value=&quot;flat&quot; selected&gt;Flat&lt;/option&gt;
+          &lt;option value=&quot;coax&quot;&gt;Coaxial&lt;/option&gt;
+        &lt;/select&gt;&lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;field&quot; id=&quot;coaxRow&quot; hidden&gt;
+        &lt;label for=&quot;coaxloss&quot;&gt;Coaxial power penalty&lt;small&gt;Extra power vs. the same rotors on a flat frame&lt;/small&gt;&lt;/label&gt;
+        &lt;div class=&quot;inwrap&quot;&gt;&lt;input id=&quot;coaxloss&quot; type=&quot;number&quot; inputmode=&quot;decimal&quot; min=&quot;0&quot; max=&quot;60&quot; step=&quot;1&quot; value=&quot;20&quot;&gt;&lt;span class=&quot;u&quot;&gt;%&lt;/span&gt;&lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;field&quot;&gt;
+        &lt;label for=&quot;frame&quot;&gt;Empty frame weight&lt;small&gt;Without flight battery&lt;/small&gt;&lt;/label&gt;
+        &lt;div class=&quot;inwrap&quot;&gt;&lt;input id=&quot;frame&quot; type=&quot;number&quot; inputmode=&quot;decimal&quot; min=&quot;0&quot; step=&quot;0.1&quot; value=&quot;8&quot;&gt;&lt;span class=&quot;u um&quot;&gt;kg&lt;/span&gt;&lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;field&quot;&gt;
+        &lt;label for=&quot;mtow&quot;&gt;Max take-off weight&lt;/label&gt;
+        &lt;div class=&quot;inwrap&quot;&gt;&lt;input id=&quot;mtow&quot; type=&quot;number&quot; inputmode=&quot;decimal&quot; min=&quot;0&quot; step=&quot;0.1&quot; value=&quot;20&quot;&gt;&lt;span class=&quot;u um&quot;&gt;kg&lt;/span&gt;&lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/fieldset&gt;
 
-    <fieldset>
-      <legend>Battery</legend>
-      <div class="field">
-        <div class="lblwrap"><label for="cells">Battery configuration</label><span class="tip" tabindex="0" role="button" aria-label="About battery configuration">?<span class="tip-body" role="tooltip"><span>Based on a Li-Po battery: 3.7 V per cell nominal, 4.2 V per cell fully charged.</span><span>6S: 22.2 V nominal, 25.2 V full</span><span>12S: 44.4 V nominal, 50.4 V full</span><span>14S: 51.8 V nominal, 58.8 V full</span></span></span></div>
-        <div class="inwrap"><select id="cells">
-          <option value="6">6S</option>
-          <option value="12" selected>12S</option>
-          <option value="14">14S</option>
-        </select></div>
-      </div>
-      <div class="field">
-        <div class="lblwrap"><label for="backup">Backup battery weight</label><span class="tip" tabindex="0" role="button" aria-label="About the backup battery">?<span class="tip-body" role="tooltip"><span>A small battery on the drone that steps in when the tether can’t keep up.</span><span>It gives extra power for sudden demands, like climbing fast or holding position in strong gusts, and keeps the drone flying long enough to land safely if tether power is lost.</span></span></span><small>A backup battery is strongly recommended for safety purposes</small></div>
-        <div class="inwrap"><input id="backup" type="number" inputmode="decimal" min="0" step="0.1" value="1.5"><span class="u um">kg</span></div>
-      </div>
-    </fieldset>
+    &lt;fieldset&gt;
+      &lt;legend&gt;Battery&lt;/legend&gt;
+      &lt;div class=&quot;field&quot;&gt;
+        &lt;div class=&quot;lblwrap&quot;&gt;&lt;label for=&quot;cells&quot;&gt;Battery configuration&lt;/label&gt;&lt;span class=&quot;tip&quot; tabindex=&quot;0&quot; role=&quot;button&quot; aria-label=&quot;About battery configuration&quot;&gt;?&lt;span class=&quot;tip-body&quot; role=&quot;tooltip&quot;&gt;&lt;span&gt;Based on a Li-Po battery: 3.7 V per cell nominal, 4.2 V per cell fully charged.&lt;/span&gt;&lt;span&gt;6S: 22.2 V nominal, 25.2 V full&lt;/span&gt;&lt;span&gt;12S: 44.4 V nominal, 50.4 V full&lt;/span&gt;&lt;span&gt;14S: 51.8 V nominal, 58.8 V full&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/div&gt;
+        &lt;div class=&quot;inwrap&quot;&gt;&lt;select id=&quot;cells&quot;&gt;
+          &lt;option value=&quot;6&quot;&gt;6S&lt;/option&gt;
+          &lt;option value=&quot;12&quot; selected&gt;12S&lt;/option&gt;
+          &lt;option value=&quot;14&quot;&gt;14S&lt;/option&gt;
+        &lt;/select&gt;&lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;field&quot;&gt;
+        &lt;div class=&quot;lblwrap&quot;&gt;&lt;label for=&quot;backup&quot;&gt;Backup battery weight&lt;/label&gt;&lt;span class=&quot;tip&quot; tabindex=&quot;0&quot; role=&quot;button&quot; aria-label=&quot;About the backup battery&quot;&gt;?&lt;span class=&quot;tip-body&quot; role=&quot;tooltip&quot;&gt;&lt;span&gt;A small battery on the drone that steps in when the tether can’t keep up.&lt;/span&gt;&lt;span&gt;It gives extra power for sudden demands, like climbing fast or holding position in strong gusts, and keeps the drone flying long enough to land safely if tether power is lost.&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;small&gt;A backup battery is strongly recommended for safety purposes&lt;/small&gt;&lt;/div&gt;
+        &lt;div class=&quot;inwrap&quot;&gt;&lt;input id=&quot;backup&quot; type=&quot;number&quot; inputmode=&quot;decimal&quot; min=&quot;0&quot; step=&quot;0.1&quot; value=&quot;1.5&quot;&gt;&lt;span class=&quot;u um&quot;&gt;kg&lt;/span&gt;&lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/fieldset&gt;
 
-    <fieldset>
-      <legend>Payload</legend>
-      <div class="field">
-        <label for="payload">Payload weight<small>Camera, gimbal, sensors</small></label>
-        <div class="inwrap"><input id="payload" type="number" inputmode="decimal" min="0" step="0.1" value="1.5"><span class="u um">kg</span></div>
-      </div>
-      <div class="field">
-        <div class="lblwrap"><label for="ppw">Payload power draw</label><span class="tip" tabindex="0" role="button" aria-label="About payload power draw">?<span class="tip-body" role="tooltip"><span>How much power your payload uses in normal operation.</span><span>For example, a gimbal surveillance camera uses about 30 W, and a floodlight can use 500 W.</span></span></span></div>
-        <div class="inwrap"><input id="ppw" type="number" inputmode="decimal" min="0" step="5" value="30"><span class="u">W</span></div>
-      </div>
-    </fieldset>
+    &lt;fieldset&gt;
+      &lt;legend&gt;Payload&lt;/legend&gt;
+      &lt;div class=&quot;field&quot;&gt;
+        &lt;label for=&quot;payload&quot;&gt;Payload weight&lt;small&gt;Camera, gimbal, sensors&lt;/small&gt;&lt;/label&gt;
+        &lt;div class=&quot;inwrap&quot;&gt;&lt;input id=&quot;payload&quot; type=&quot;number&quot; inputmode=&quot;decimal&quot; min=&quot;0&quot; step=&quot;0.1&quot; value=&quot;1.5&quot;&gt;&lt;span class=&quot;u um&quot;&gt;kg&lt;/span&gt;&lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;field&quot;&gt;
+        &lt;div class=&quot;lblwrap&quot;&gt;&lt;label for=&quot;ppw&quot;&gt;Payload power draw&lt;/label&gt;&lt;span class=&quot;tip&quot; tabindex=&quot;0&quot; role=&quot;button&quot; aria-label=&quot;About payload power draw&quot;&gt;?&lt;span class=&quot;tip-body&quot; role=&quot;tooltip&quot;&gt;&lt;span&gt;How much power your payload uses in normal operation.&lt;/span&gt;&lt;span&gt;For example, a gimbal surveillance camera uses about 30 W, and a floodlight can use 500 W.&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/div&gt;
+        &lt;div class=&quot;inwrap&quot;&gt;&lt;input id=&quot;ppw&quot; type=&quot;number&quot; inputmode=&quot;decimal&quot; min=&quot;0&quot; step=&quot;5&quot; value=&quot;30&quot;&gt;&lt;span class=&quot;u&quot;&gt;W&lt;/span&gt;&lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/fieldset&gt;
 
-    <fieldset>
-      <legend>Ground unit</legend>
-      <div class="field">
-        <label for="vin">Input power</label>
-        <div class="inwrap"><select id="vin">
-          <option value="ac110">100–120 VAC</option>
-          <option value="ac230" selected>220–240 VAC</option>
-          <option value="dc270">270 VDC</option>
-        </select></div>
-      </div>
-    </fieldset>
+    &lt;fieldset&gt;
+      &lt;legend&gt;Ground unit&lt;/legend&gt;
+      &lt;div class=&quot;field&quot;&gt;
+        &lt;label for=&quot;vin&quot;&gt;Input power&lt;/label&gt;
+        &lt;div class=&quot;inwrap&quot;&gt;&lt;select id=&quot;vin&quot;&gt;
+          &lt;option value=&quot;ac110&quot;&gt;100–120 VAC&lt;/option&gt;
+          &lt;option value=&quot;ac230&quot; selected&gt;220–240 VAC&lt;/option&gt;
+          &lt;option value=&quot;dc270&quot;&gt;270 VDC&lt;/option&gt;
+        &lt;/select&gt;&lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/fieldset&gt;
 
-    <details class="assume">
-      <summary>Advanced configuration</summary>
-      <p>Defaults suit typical setups. Change them if you have test-stand data.</p>
-      <div class="field wide">
-        <label for="tension">Tether tension</label>
-        <div class="rangerow"><input id="tension" type="range" min="400" max="800" step="50" value="500"><output id="tensionOut" for="tension">500 g</output></div>
-      </div>
-      <div class="field">
-        <label for="rho">Air density<small id="rhoHint">1.225 at 15 °C sea level, 1.16 at 30 °C</small></label>
-        <div class="inwrap"><input id="rho" type="number" inputmode="decimal" min="0.5" max="1.4" step="0.005" value="1.225"><span class="u ur">kg/m³</span></div>
-      </div>
-      <div class="field">
-        <label for="fm">Rotor figure of merit</label>
-        <div class="inwrap"><input id="fm" type="number" inputmode="decimal" min="0.3" max="0.85" step="0.01" value="0.60"></div>
-      </div>
-      <div class="field">
-        <label for="eta">Motor + ESC efficiency</label>
-        <div class="inwrap"><input id="eta" type="number" inputmode="decimal" min="0.5" max="0.98" step="0.01" value="0.85"></div>
-      </div>
-      <div class="field">
-        <label for="aux">Avionics power<small>Flight controller, radios, GPS</small></label>
-        <div class="inwrap"><input id="aux" type="number" inputmode="decimal" min="0" step="5" value="30"><span class="u">W</span></div>
-      </div>
-      <div class="field">
-        <label for="reserve">Power reserve, with backup battery<small>Kept free for wind and manoeuvres</small></label>
-        <div class="inwrap"><input id="reserve" type="number" inputmode="decimal" min="0" max="60" step="5" value="20"><span class="u">%</span></div>
-      </div>
-      <div class="field">
-        <label for="reserveNo">Power reserve, no backup battery<small>Used when backup battery weight is 0</small></label>
-        <div class="inwrap"><input id="reserveNo" type="number" inputmode="decimal" min="0" max="80" step="5" value="40"><span class="u">%</span></div>
-      </div>
-    </details>
-  </form>
+    &lt;details class=&quot;assume&quot;&gt;
+      &lt;summary&gt;Advanced configuration&lt;/summary&gt;
+      &lt;p&gt;Defaults suit typical setups. Change them if you have test-stand data.&lt;/p&gt;
+      &lt;div class=&quot;field wide&quot;&gt;
+        &lt;label for=&quot;tension&quot;&gt;Tether tension&lt;/label&gt;
+        &lt;div class=&quot;rangerow&quot;&gt;&lt;input id=&quot;tension&quot; type=&quot;range&quot; min=&quot;400&quot; max=&quot;800&quot; step=&quot;50&quot; value=&quot;500&quot;&gt;&lt;output id=&quot;tensionOut&quot; for=&quot;tension&quot;&gt;500 g&lt;/output&gt;&lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;field&quot;&gt;
+        &lt;label for=&quot;rho&quot;&gt;Air density&lt;small id=&quot;rhoHint&quot;&gt;1.225 at 15 °C sea level, 1.16 at 30 °C&lt;/small&gt;&lt;/label&gt;
+        &lt;div class=&quot;inwrap&quot;&gt;&lt;input id=&quot;rho&quot; type=&quot;number&quot; inputmode=&quot;decimal&quot; min=&quot;0.5&quot; max=&quot;1.4&quot; step=&quot;0.005&quot; value=&quot;1.225&quot;&gt;&lt;span class=&quot;u ur&quot;&gt;kg/m³&lt;/span&gt;&lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;field&quot;&gt;
+        &lt;label for=&quot;fm&quot;&gt;Rotor figure of merit&lt;/label&gt;
+        &lt;div class=&quot;inwrap&quot;&gt;&lt;input id=&quot;fm&quot; type=&quot;number&quot; inputmode=&quot;decimal&quot; min=&quot;0.3&quot; max=&quot;0.85&quot; step=&quot;0.01&quot; value=&quot;0.60&quot;&gt;&lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;field&quot;&gt;
+        &lt;label for=&quot;eta&quot;&gt;Motor + ESC efficiency&lt;/label&gt;
+        &lt;div class=&quot;inwrap&quot;&gt;&lt;input id=&quot;eta&quot; type=&quot;number&quot; inputmode=&quot;decimal&quot; min=&quot;0.5&quot; max=&quot;0.98&quot; step=&quot;0.01&quot; value=&quot;0.85&quot;&gt;&lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;field&quot;&gt;
+        &lt;label for=&quot;aux&quot;&gt;Avionics power&lt;small&gt;Flight controller, radios, GPS&lt;/small&gt;&lt;/label&gt;
+        &lt;div class=&quot;inwrap&quot;&gt;&lt;input id=&quot;aux&quot; type=&quot;number&quot; inputmode=&quot;decimal&quot; min=&quot;0&quot; step=&quot;5&quot; value=&quot;30&quot;&gt;&lt;span class=&quot;u&quot;&gt;W&lt;/span&gt;&lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;field&quot;&gt;
+        &lt;label for=&quot;reserve&quot;&gt;Power reserve, with backup battery&lt;small&gt;Kept free for wind and manoeuvres&lt;/small&gt;&lt;/label&gt;
+        &lt;div class=&quot;inwrap&quot;&gt;&lt;input id=&quot;reserve&quot; type=&quot;number&quot; inputmode=&quot;decimal&quot; min=&quot;0&quot; max=&quot;60&quot; step=&quot;5&quot; value=&quot;20&quot;&gt;&lt;span class=&quot;u&quot;&gt;%&lt;/span&gt;&lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;field&quot;&gt;
+        &lt;label for=&quot;reserveNo&quot;&gt;Power reserve, no backup battery&lt;small&gt;Used when backup battery weight is 0&lt;/small&gt;&lt;/label&gt;
+        &lt;div class=&quot;inwrap&quot;&gt;&lt;input id=&quot;reserveNo&quot; type=&quot;number&quot; inputmode=&quot;decimal&quot; min=&quot;0&quot; max=&quot;80&quot; step=&quot;5&quot; value=&quot;40&quot;&gt;&lt;span class=&quot;u&quot;&gt;%&lt;/span&gt;&lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/details&gt;
+  &lt;/form&gt;
 
-  <section aria-live="polite">
-    <h2>Recommended system</h2>
-    <div class="hero">
-      <svg id="tether" viewBox="0 22 240 254" role="img" aria-label="Tether height diagram"></svg>
-      <div class="rec" id="rec"></div>
-    </div>
-    <p class="disclaimer">This calculator gives an estimate only. We can’t guarantee that your drone will fly with this setup, because real-world performance depends on many more factors. Please consult Volarious for advice on your setup.</p>
+  &lt;section aria-live=&quot;polite&quot;&gt;
+    &lt;h2&gt;Recommended system&lt;/h2&gt;
+    &lt;div class=&quot;hero&quot;&gt;
+      &lt;svg id=&quot;tether&quot; viewBox=&quot;0 22 240 254&quot; role=&quot;img&quot; aria-label=&quot;Tether height diagram&quot;&gt;&lt;/svg&gt;
+      &lt;div class=&quot;rec&quot; id=&quot;rec&quot;&gt;&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;p class=&quot;disclaimer&quot;&gt;This calculator gives an estimate only. We can’t guarantee that your drone will fly with this setup, because real-world performance depends on many more factors. Please consult Volarious for advice on your setup.&lt;/p&gt;
+    &lt;button type=&quot;button&quot; class=&quot;planbtn&quot; id=&quot;planBtn&quot;&gt;&lt;/button&gt;
 
-    <h2>Air unit comparison</h2>
-    <div class="tablewrap"><table id="cmp"></table></div>
+    &lt;h2&gt;Air unit comparison&lt;/h2&gt;
+    &lt;div class=&quot;tablewrap&quot;&gt;&lt;table id=&quot;cmp&quot;&gt;&lt;/table&gt;&lt;/div&gt;
 
-    <h2>Hover power against tether length</h2>
-    <div class="chartwrap">
-      <svg id="chart" viewBox="0 0 640 290" role="img" aria-label="Hover power against tether length for each air unit"></svg>
-      <div class="legend" id="legend"></div>
-    </div>
+    &lt;h2&gt;Hover power against tether length&lt;/h2&gt;
+    &lt;div class=&quot;chartwrap&quot;&gt;
+      &lt;svg id=&quot;chart&quot; viewBox=&quot;0 0 640 290&quot; role=&quot;img&quot; aria-label=&quot;Hover power against tether length for each air unit&quot;&gt;&lt;/svg&gt;
+      &lt;div class=&quot;legend&quot; id=&quot;legend&quot;&gt;&lt;/div&gt;
+    &lt;/div&gt;
 
-    <details class="method">
-      <summary>How it’s calculated</summary>
-      <ul>
-        <li>The air unit replaces the flight battery. Weight the drone holds in hover = frame + air unit + payload + backup battery + hanging cable (length × cable weight per metre) + tether tension.</li>
-        <li>Hover power uses momentum theory: <code>P = (W·g)<sup>1.5</sup> ÷ √(2ρ·N·A) ÷ (FM × η) + avionics + payload power</code>, where A is one rotor’s disc area.</li>
-        <li>For coaxial frames, hover power is multiplied by the coaxial penalty (default 20%) to account for the lower rotor working in the upper rotor’s wake. The rotor count must be even.</li>
-        <li>Maximum tether length is the smallest of three limits: hover power within the air unit rating minus the reserve, total weight within MTOW, and the cable length on the drum (150 m for 3 kW, 100 m for 6 kW).</li>
-        <li>Each air unit pairs with its own ground unit, which holds the tether: the 3 kW air unit with the 3 kW ground unit (150 m of tether), and the 6 kW air unit with the 6.5 kW ground unit (100 m of tether).</li>
-        <li>Power available to the drone is the lower of the air unit rating and the ground unit output. Below 180 V input (the 100–120 VAC option), the 3 kW ground unit is limited to 1.75 kW and the 6.5 kW ground unit to 3.25 kW.</li>
-        <li>The power reserve is 20% with a backup battery and 40% without one, because without a battery the drone has nothing to fall back on in a gust or a tether power loss.</li>
-        <li>Height assumes the cable hangs close to vertical. Wind, drift and cable drag reduce real height and add load, so treat the result as an upper bound.</li>
-        <li>When both units reach a similar height, the lighter 3 kW unit is recommended.</li>
-      </ul>
-    </details>
-  </section>
-</main>
+    &lt;details class=&quot;method&quot;&gt;
+      &lt;summary&gt;How it’s calculated&lt;/summary&gt;
+      &lt;ul&gt;
+        &lt;li&gt;The air unit replaces the flight battery. Weight the drone holds in hover = frame + air unit + payload + backup battery + hanging cable (length × cable weight per metre) + tether tension.&lt;/li&gt;
+        &lt;li&gt;Hover power uses momentum theory: &lt;code&gt;P = (W·g)&lt;sup&gt;1.5&lt;/sup&gt; ÷ √(2ρ·N·A) ÷ (FM × η) + avionics + payload power&lt;/code&gt;, where A is one rotor’s disc area.&lt;/li&gt;
+        &lt;li&gt;For coaxial frames, hover power is multiplied by the coaxial penalty (default 20%) to account for the lower rotor working in the upper rotor’s wake. The rotor count must be even.&lt;/li&gt;
+        &lt;li&gt;Maximum tether length is the smallest of three limits: hover power within the air unit rating minus the reserve, total weight within MTOW, and the cable length on the drum (150 m for 3 kW, 100 m for 6 kW).&lt;/li&gt;
+        &lt;li&gt;Each air unit pairs with its own ground unit, which holds the tether: the 3 kW air unit with the 3 kW ground unit (150 m of tether), and the 6 kW air unit with the 6.5 kW ground unit (100 m of tether).&lt;/li&gt;
+        &lt;li&gt;Power available to the drone is the lower of the air unit rating and the ground unit output. Below 180 V input (the 100–120 VAC option), the 3 kW ground unit is limited to 1.75 kW and the 6.5 kW ground unit to 3.25 kW.&lt;/li&gt;
+        &lt;li&gt;The power reserve is 20% with a backup battery and 40% without one, because without a battery the drone has nothing to fall back on in a gust or a tether power loss.&lt;/li&gt;
+        &lt;li&gt;Height assumes the cable hangs close to vertical. Wind, drift and cable drag reduce real height and add load, so treat the result as an upper bound.&lt;/li&gt;
+        &lt;li&gt;When both units reach a similar height, the lighter 3 kW unit is recommended.&lt;/li&gt;
+      &lt;/ul&gt;
+    &lt;/details&gt;
+  &lt;/section&gt;
+&lt;/main&gt;
 
-<script>
+&lt;script&gt;
 (function(){
   const G = 9.80665;
   const UNITS = [
-    {id:"3kW", name:"3 kW air unit", power:3000, mass:1.5, gpm:18.3, maxLen:150, cells:[6,12,14], groundKw:3, groundOut:{ac110:1750, ac230:3000, dc270:3000}, color:"var(--steel)"},
-    {id:"6kW", name:"6 kW air unit", power:6000, mass:2.5, gpm:30,   maxLen:100, cells:[12,14], groundKw:6.5, groundOut:{ac110:3250, ac230:6500, dc270:6500},   color:"var(--amber)"}
+    {id:&quot;3kW&quot;, name:&quot;3 kW air unit&quot;, power:3000, mass:1.5, gpm:18.3, maxLen:150, cells:[6,12,14], groundKw:3, groundOut:{ac110:1750, ac230:3000, dc270:3000}, color:&quot;var(--steel)&quot;},
+    {id:&quot;6kW&quot;, name:&quot;6 kW air unit&quot;, power:6000, mass:2.5, gpm:30,   maxLen:100, cells:[12,14], groundKw:6.5, groundOut:{ac110:3250, ac230:6500, dc270:6500},   color:&quot;var(--amber)&quot;}
   ];
-  const $ = id => document.getElementById(id);
-  const num = id => parseFloat($(id).value);
+  const $ = id =&gt; document.getElementById(id);
+  const num = id =&gt; parseFloat($(id).value);
   const KG_LB = 2.20462, M_FT = 3.28084, RHO_C = 0.062428;
   let IMP = false;
-  const LU = () => IMP ? "ft" : "m";
-  const len = m => IMP ? m*M_FT : m;
-  const mass = id => IMP ? num(id)/KG_LB : num(id);
-  const fmt = (v,d=1) => Number.isFinite(v) ? v.toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d}) : "–";
-  const fmtLen = (m,d=0) => `${fmt(len(m),d)} ${LU()}`;
-  const fmtMass = (kg,d=2) => `${fmt(IMP?kg*KG_LB:kg,d)} ${IMP?"lb":"kg"}`;
+  const LU = () =&gt; IMP ? &quot;ft&quot; : &quot;m&quot;;
+  const len = m =&gt; IMP ? m*M_FT : m;
+  const mass = id =&gt; IMP ? num(id)/KG_LB : num(id);
+  const fmt = (v,d=1) =&gt; Number.isFinite(v) ? v.toLocaleString(&quot;en-US&quot;,{minimumFractionDigits:d,maximumFractionDigits:d}) : &quot;–&quot;;
+  const fmtLen = (m,d=0) =&gt; `${fmt(len(m),d)} ${LU()}`;
+  const fmtMass = (kg,d=2) =&gt; `${fmt(IMP?kg*KG_LB:kg,d)} ${IMP?&quot;lb&quot;:&quot;kg&quot;}`;
 
   function read(){
     return {
-      n: Math.round(num("n")), dIn: num("d"),
-      cells: parseInt($("cells").value,10),
-      vin: $("vin").value,
-      frame: mass("frame"), mtow: mass("mtow"), payload: mass("payload"),
-      tension: num("tension")/1000, backup: mass("backup"),
-      coax: $("layout").value === "coax",
-      coaxLoss: num("coaxloss")/100,
-      rho: IMP ? num("rho")/RHO_C : num("rho"), fm: num("fm"), eta: num("eta"), aux: num("aux") + num("ppw"), ppw: num("ppw"), reserve: (num("backup")>0 ? num("reserve") : num("reserveNo"))/100
+      n: Math.round(num(&quot;n&quot;)), dIn: num(&quot;d&quot;),
+      cells: parseInt($(&quot;cells&quot;).value,10),
+      vin: $(&quot;vin&quot;).value,
+      frame: mass(&quot;frame&quot;), mtow: mass(&quot;mtow&quot;), payload: mass(&quot;payload&quot;),
+      tension: num(&quot;tension&quot;)/1000, backup: mass(&quot;backup&quot;),
+      coax: $(&quot;layout&quot;).value === &quot;coax&quot;,
+      coaxLoss: num(&quot;coaxloss&quot;)/100,
+      rho: IMP ? num(&quot;rho&quot;)/RHO_C : num(&quot;rho&quot;), fm: num(&quot;fm&quot;), eta: num(&quot;eta&quot;), aux: num(&quot;aux&quot;) + num(&quot;ppw&quot;), ppw: num(&quot;ppw&quot;), reserve: (num(&quot;backup&quot;)&gt;0 ? num(&quot;reserve&quot;) : num(&quot;reserveNo&quot;))/100
     };
   }
   function validate(p){
     const bad = [];
-    if(!(p.n>=3)) bad.push("number of rotors (3 or more)");
-    if(!(p.dIn>0)) bad.push("rotor size");
-    if(!(p.frame>0)) bad.push("empty frame weight");
-    if(!(p.mtow>0)) bad.push("max take-off weight");
-    if(!(p.payload>=0)) bad.push("payload weight");
-    if(!(p.backup>=0)) bad.push("backup battery weight (0 if none)");
-    if(!(p.ppw>=0)) bad.push("payload power draw");
-    if(p.coax && p.n%2!==0) bad.push("number of rotors (must be even for coaxial)");
-    if(p.coax && !(p.coaxLoss>=0)) bad.push("coaxial power penalty");
-    if(!(p.rho>0)||!(p.fm>0)||!(p.eta>0)||!(p.aux>=0)||!(p.reserve>=0&&p.reserve<1)) bad.push("advanced configuration");
+    if(!(p.n&gt;=3)) bad.push(&quot;number of rotors (3 or more)&quot;);
+    if(!(p.dIn&gt;0)) bad.push(&quot;rotor size&quot;);
+    if(!(p.frame&gt;0)) bad.push(&quot;empty frame weight&quot;);
+    if(!(p.mtow&gt;0)) bad.push(&quot;max take-off weight&quot;);
+    if(!(p.payload&gt;=0)) bad.push(&quot;payload weight&quot;);
+    if(!(p.backup&gt;=0)) bad.push(&quot;backup battery weight (0 if none)&quot;);
+    if(!(p.ppw&gt;=0)) bad.push(&quot;payload power draw&quot;);
+    if(p.coax &amp;&amp; p.n%2!==0) bad.push(&quot;number of rotors (must be even for coaxial)&quot;);
+    if(p.coax &amp;&amp; !(p.coaxLoss&gt;=0)) bad.push(&quot;coaxial power penalty&quot;);
+    if(!(p.rho&gt;0)||!(p.fm&gt;0)||!(p.eta&gt;0)||!(p.aux&gt;=0)||!(p.reserve&gt;=0&amp;&amp;p.reserve&lt;1)) bad.push(&quot;advanced configuration&quot;);
     return bad;
   }
   function diskArea(p){ const r = p.dIn*0.0254/2; return Math.PI*r*r*p.n; }
@@ -343,16 +403,16 @@ try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.docu
     const avail = Math.min(u.power, gW);
     const usable = avail*(1-p.reserve);
     const mech = (usable - p.aux)*p.fm*p.eta/coaxK(p);
-    const wPower = mech>0 ? Math.pow(mech*Math.sqrt(2*p.rho*diskArea(p)),2/3)/G : 0;
+    const wPower = mech&gt;0 ? Math.pow(mech*Math.sqrt(2*p.rho*diskArea(p)),2/3)/G : 0;
     const fixed = p.frame + u.mass + p.payload + p.backup + p.tension;
     const w = u.gpm/1000;
     const lim = [
-      {k:"power", L:(wPower-fixed)/w, text: gW < u.power ? "ground unit output" : "air unit power"},
-      {k:"mtow",  L:(p.mtow-fixed)/w, text:"max take-off weight"},
-      {k:"cable", L:u.maxLen,          text:"cable length on the drum"}
-    ].sort((a,b)=>a.L-b.L);
+      {k:&quot;power&quot;, L:(wPower-fixed)/w, text: gW &lt; u.power ? &quot;ground unit output&quot; : &quot;air unit power&quot;},
+      {k:&quot;mtow&quot;,  L:(p.mtow-fixed)/w, text:&quot;max take-off weight&quot;},
+      {k:&quot;cable&quot;, L:u.maxLen,          text:&quot;cable length on the drum&quot;}
+    ].sort((a,b)=&gt;a.L-b.L);
     const L = Math.max(0, Math.min(lim[0].L, u.maxLen));
-    const feasible = lim[0].L >= 1;
+    const feasible = lim[0].L &gt;= 1;
     const total = fixed + w*L;
     const pw = hoverPower(total,p);
     return {u, compatible:true, feasible, L, limiter:lim[0], fixed, w, total, pw, usable, wPower,
@@ -360,149 +420,155 @@ try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.docu
             maxPayload: Math.min(wPower,p.mtow) - (fixed - p.payload) - w*u.maxLen};
   }
   function pick(rs){
-    const ok = rs.filter(r=>r.compatible&&r.feasible);
+    const ok = rs.filter(r=&gt;r.compatible&amp;&amp;r.feasible);
     if(!ok.length) return null;
-    ok.sort((a,b)=> (b.L-a.L) > 1 ? 1 : (a.L-b.L) > 1 ? -1 : a.u.mass-b.u.mass);
+    ok.sort((a,b)=&gt; (b.L-a.L) &gt; 1 ? 1 : (a.L-b.L) &gt; 1 ? -1 : a.u.mass-b.u.mass);
     return ok[0];
   }
 
   function renderRec(best,rs,p,errors){
-    const el = $("rec");
-    el.className = "rec";
+    $(&quot;planBtn&quot;).textContent = `Plan electrical integration for ${p.cells}S →`;
+    $(&quot;planBtn&quot;).hidden = !!errors.length;
+    const el = $(&quot;rec&quot;);
+    el.className = &quot;rec&quot;;
     if(errors.length){
-      el.className = "rec bad";
-      el.innerHTML = `<p class="pick">Check your inputs</p><p class="why">Enter a valid value for: ${errors.join(", ")}.</p>`;
+      el.className = &quot;rec bad&quot;;
+      el.innerHTML = `&lt;p class=&quot;pick&quot;&gt;Check your inputs&lt;/p&gt;&lt;p class=&quot;why&quot;&gt;Enter a valid value for: ${errors.join(&quot;, &quot;)}.&lt;/p&gt;`;
       return;
     }
     if(!best){
-      el.className = "rec bad";
-      const reasons = rs.map(r=>{
+      el.className = &quot;rec bad&quot;;
+      const reasons = rs.map(r=&gt;{
         if(!r.compatible) return `The ${r.u.name} does not support ${p.cells}S.`;
         return `The ${r.u.name} is ${fmtMass(r.shortKg)} over its ${r.limiter.text} limit before any cable is added.`;
-      }).join(" ");
-      el.innerHTML = `<div class="stats">
-          <div class="stat unit"><div class="k">Air unit</div><div class="v">None</div><div class="s">fits this setup</div></div>
-          <div class="stat unit"><div class="k">Ground unit</div><div class="v">–</div></div>
-          <div class="stat"><div class="k">Max tether length</div><div class="v">0<span class="mu">${LU()}</span></div></div>
-        </div>
-        <p class="why">${reasons} Reduce the payload or tension, or use a drone with more lift.</p>`;
+      }).join(&quot; &quot;);
+      el.innerHTML = `&lt;div class=&quot;stats&quot;&gt;
+          &lt;div class=&quot;stat unit&quot;&gt;&lt;div class=&quot;k&quot;&gt;Air unit&lt;/div&gt;&lt;div class=&quot;v&quot;&gt;None&lt;/div&gt;&lt;div class=&quot;s&quot;&gt;fits this setup&lt;/div&gt;&lt;/div&gt;
+          &lt;div class=&quot;stat unit&quot;&gt;&lt;div class=&quot;k&quot;&gt;Ground unit&lt;/div&gt;&lt;div class=&quot;v&quot;&gt;–&lt;/div&gt;&lt;/div&gt;
+          &lt;div class=&quot;stat&quot;&gt;&lt;div class=&quot;k&quot;&gt;Max tether length&lt;/div&gt;&lt;div class=&quot;v&quot;&gt;0&lt;span class=&quot;mu&quot;&gt;${LU()}&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;
+        &lt;/div&gt;
+        &lt;p class=&quot;why&quot;&gt;${reasons} Reduce the payload or tension, or use a drone with more lift.&lt;/p&gt;`;
       return;
     }
-    const other = rs.find(r=>r!==best);
-    let otherTxt = "";
+    const other = rs.find(r=&gt;r!==best);
+    let otherTxt = &quot;&quot;;
     if(other){
       if(!other.compatible) otherTxt = ` The ${other.u.name} doesn’t support ${p.cells}S.`;
       else if(!other.feasible) otherTxt = ` The ${other.u.name} can’t lift this setup.`;
       else otherTxt = ` The ${other.u.name} reaches ${fmtLen(other.L)}.`;
     }
-    el.innerHTML = `<div class="stats">
-        <div class="stat unit"><div class="k">Recommended air unit</div><div class="v">${best.u.power/1000}<span class="mu">kW</span></div></div>
-        <div class="stat unit"><div class="k">Recommended ground unit</div><div class="v">${best.u.groundKw}<span class="mu">kW</span></div></div>
-        <div class="stat"><div class="k">Max tether length</div><div class="v">${fmt(len(best.L),0)}<span class="mu">${LU()}</span></div></div>
-      </div>
-      <p class="why">Limited by ${best.limiter.text}. Hover power at this height is ${fmt(best.pw/1000,2)} kW of the ${fmt(best.avail/1000, best.avail%100 ? 2 : (best.avail%1000 ? 1 : 0))} kW available.${otherTxt}${best.gW < best.u.groundKw*1000 ? ` On 100–120 VAC the ${best.u.groundKw} kW ground unit output is limited to ${fmt(best.gW/1000,2)} kW.` : ""}</p>`;
+    el.innerHTML = `&lt;div class=&quot;stats&quot;&gt;
+        &lt;div class=&quot;stat unit&quot;&gt;&lt;div class=&quot;k&quot;&gt;Recommended air unit&lt;/div&gt;&lt;div class=&quot;v&quot;&gt;${best.u.power/1000}&lt;span class=&quot;mu&quot;&gt;kW&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;
+        &lt;div class=&quot;stat unit&quot;&gt;&lt;div class=&quot;k&quot;&gt;Recommended ground unit&lt;/div&gt;&lt;div class=&quot;v&quot;&gt;${best.u.groundKw}&lt;span class=&quot;mu&quot;&gt;kW&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;
+        &lt;div class=&quot;stat&quot;&gt;&lt;div class=&quot;k&quot;&gt;Max tether length&lt;/div&gt;&lt;div class=&quot;v&quot;&gt;${fmt(len(best.L),0)}&lt;span class=&quot;mu&quot;&gt;${LU()}&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;
+      &lt;/div&gt;
+      &lt;p class=&quot;why&quot;&gt;Limited by ${best.limiter.text}. Hover power at this height is ${fmt(best.pw/1000,2)} kW of the ${fmt(best.avail/1000, best.avail%100 ? 2 : (best.avail%1000 ? 1 : 0))} kW available.${otherTxt}${best.gW &lt; best.u.groundKw*1000 ? ` On 100–120 VAC the ${best.u.groundKw} kW ground unit output is limited to ${fmt(best.gW/1000,2)} kW.` : &quot;&quot;}&lt;/p&gt;`;
   }
 
+  $(&quot;planBtn&quot;).addEventListener(&quot;click&quot;, ()=&gt;{
+    parent.postMessage({vt:&quot;plan&quot;, cells:+$(&quot;cells&quot;).value}, &quot;*&quot;);
+  });
+
   function renderTether(best,rs){
-    const y = h => 250 - h/150*200;
-    let s = `<g class="ax">`;
+    const y = h =&gt; 250 - h/150*200;
+    let s = `&lt;g class=&quot;ax&quot;&gt;`;
     const ticks = IMP ? [0,100,200,300,400,492] : [0,25,50,75,100,125,150];
     for(const v of ticks){
       const h = IMP ? v/M_FT : v;
-      s += `<line x1="30" x2="38" y1="${y(h)}" y2="${y(h)}"/><text x="26" y="${y(h)+4}" text-anchor="end">${v}</text>`;
+      s += `&lt;line x1=&quot;30&quot; x2=&quot;38&quot; y1=&quot;${y(h)}&quot; y2=&quot;${y(h)}&quot;/&gt;&lt;text x=&quot;26&quot; y=&quot;${y(h)+4}&quot; text-anchor=&quot;end&quot;&gt;${v}&lt;/text&gt;`;
     }
-    s += `<line x1="38" x2="38" y1="${y(0)}" y2="${y(150)}"/><text x="26" y="${y(150)-14}" text-anchor="end">${LU()}</text></g>`;
+    s += `&lt;line x1=&quot;38&quot; x2=&quot;38&quot; y1=&quot;${y(0)}&quot; y2=&quot;${y(150)}&quot;/&gt;&lt;text x=&quot;26&quot; y=&quot;${y(150)-14}&quot; text-anchor=&quot;end&quot;&gt;${LU()}&lt;/text&gt;&lt;/g&gt;`;
     let lastLabelY = null;
-    rs.filter(r=>r.compatible&&r.feasible).sort((a,b)=>b.L-a.L).forEach(r=>{
+    rs.filter(r=&gt;r.compatible&amp;&amp;r.feasible).sort((a,b)=&gt;b.L-a.L).forEach(r=&gt;{
       const yy = y(r.L);
       let ly = yy-5;
-      if(lastLabelY!==null && Math.abs(ly-lastLabelY)<13) ly = yy+13;
+      if(lastLabelY!==null &amp;&amp; Math.abs(ly-lastLabelY)&lt;13) ly = yy+13;
       lastLabelY = ly;
-      s += `<line x1="42" x2="236" y1="${yy}" y2="${yy}" stroke="${r.u.color}" stroke-width="1.5" stroke-dasharray="5 4"/>
-            <text x="236" y="${ly}" text-anchor="end" style="fill:var(--ink);font-size:11px;font-weight:600;font-family:Barlow,system-ui,sans-serif">${r.u.power/1000} kW air unit</text>`;
+      s += `&lt;line x1=&quot;42&quot; x2=&quot;236&quot; y1=&quot;${yy}&quot; y2=&quot;${yy}&quot; stroke=&quot;${r.u.color}&quot; stroke-width=&quot;1.5&quot; stroke-dasharray=&quot;5 4&quot;/&gt;
+            &lt;text x=&quot;236&quot; y=&quot;${ly}&quot; text-anchor=&quot;end&quot; style=&quot;fill:var(--ink);font-size:11px;font-weight:600;font-family:Barlow,system-ui,sans-serif&quot;&gt;${r.u.power/1000} kW air unit&lt;/text&gt;`;
     });
-    s += `<line x1="40" x2="236" y1="268" y2="268" stroke="var(--line)" stroke-width="2"/>
-          <rect x="74" y="246" width="52" height="22" rx="3" fill="var(--ink)"/>
-          <rect x="82" y="252" width="18" height="4" rx="1" fill="var(--bg)"/>`;
+    s += `&lt;line x1=&quot;40&quot; x2=&quot;236&quot; y1=&quot;268&quot; y2=&quot;268&quot; stroke=&quot;var(--line)&quot; stroke-width=&quot;2&quot;/&gt;
+          &lt;rect x=&quot;74&quot; y=&quot;246&quot; width=&quot;52&quot; height=&quot;22&quot; rx=&quot;3&quot; fill=&quot;var(--ink)&quot;/&gt;
+          &lt;rect x=&quot;82&quot; y=&quot;252&quot; width=&quot;18&quot; height=&quot;4&quot; rx=&quot;1&quot; fill=&quot;var(--bg)&quot;/&gt;`;
     const L = best ? best.L : 0;
     const yd = y(L);
     if(best){
-      s += `<line id="cable" x1="100" y1="246" x2="100" y2="${yd+6}" stroke="var(--cable)" stroke-width="2.5"/>`;
+      s += `&lt;line id=&quot;cable&quot; x1=&quot;100&quot; y1=&quot;246&quot; x2=&quot;100&quot; y2=&quot;${yd+6}&quot; stroke=&quot;var(--cable)&quot; stroke-width=&quot;2.5&quot;/&gt;`;
     }
     const dy = best ? yd : 232;
-    s += `<g id="drone" style="transform:translateY(${dy}px)">
-            <line x1="70" x2="130" y1="0" y2="0" stroke="var(--ink)" stroke-width="3"/>
-            <rect x="90" y="-5" width="20" height="11" rx="2" fill="var(--ink)"/>
-            <ellipse cx="70" cy="-4" rx="13" ry="2.5" fill="var(--steel)" opacity=".7"/>
-            <ellipse cx="130" cy="-4" rx="13" ry="2.5" fill="var(--steel)" opacity=".7"/>
-          </g>`;
-    $("tether").innerHTML = s;
+    s += `&lt;g id=&quot;drone&quot; style=&quot;transform:translateY(${dy}px)&quot;&gt;
+            &lt;line x1=&quot;70&quot; x2=&quot;130&quot; y1=&quot;0&quot; y2=&quot;0&quot; stroke=&quot;var(--ink)&quot; stroke-width=&quot;3&quot;/&gt;
+            &lt;rect x=&quot;90&quot; y=&quot;-5&quot; width=&quot;20&quot; height=&quot;11&quot; rx=&quot;2&quot; fill=&quot;var(--ink)&quot;/&gt;
+            &lt;ellipse cx=&quot;70&quot; cy=&quot;-4&quot; rx=&quot;13&quot; ry=&quot;2.5&quot; fill=&quot;var(--steel)&quot; opacity=&quot;.7&quot;/&gt;
+            &lt;ellipse cx=&quot;130&quot; cy=&quot;-4&quot; rx=&quot;13&quot; ry=&quot;2.5&quot; fill=&quot;var(--steel)&quot; opacity=&quot;.7&quot;/&gt;
+          &lt;/g&gt;`;
+    $(&quot;tether&quot;).innerHTML = s;
   }
 
   function renderTable(best,rs,p){
-    const head = `<thead><tr><th></th>${rs.map(r=>`<th>${r.u.name}${r===best?'<span class="tag best">Recommended</span>':''}<span class="thsub">with ${r.u.groundKw} kW ground unit</span></th>`).join("")}</tr></thead>`;
-    const row = (label,fn) => `<tr><th scope="row">${label}</th>${rs.map(r=>{
-      if(!r.compatible) return `<td class="na">–</td>`;
-      return `<td>${fn(r)}</td>`;
-    }).join("")}</tr>`;
-    const body = `<tbody>
-      <tr><th scope="row">${p.cells}S support</th>${rs.map(r=>r.compatible?`<td>Yes</td>`:`<td class="warn">No (${r.u.cells.map(c=>c+"S").join(", ")} only)</td>`).join("")}</tr>
-      ${row("Max tether length", r=>r.feasible?`${fmtLen(r.L)}`:`<span class="warn">Can’t lift</span>`)}
-      ${row("Max payload capacity at full cable length", r=>r.maxPayload>0?`${fmtMass(r.maxPayload)} <span class="tag">at ${fmtLen(r.u.maxLen)}</span>`:`<span class="warn">None at ${fmtLen(r.u.maxLen)}</span>`)}
-      ${row("Total hover weight", r=>`${fmtMass(r.total)} <span class="tag">${fmtMass(r.mtowMargin)} to MTOW</span>`)}
-      ${row("Power available", r=>`${fmt(r.avail,0)} W${r.avail < r.u.power ? ' <span class="tag">limited by ground unit</span>' : ''}`)}
-      ${row("Hover power", r=>`${fmt(r.pw,0)} W <span class="tag">${fmt(r.pw/r.avail*100,0)}% of available</span>`)}
-      ${row("Power reserve applied", r=>`${fmt(p.reserve*100,0)}% <span class="tag">${p.backup>0?"with backup battery":"no backup battery"}</span>`)}
-    </tbody>`;
-    $("cmp").innerHTML = head + body;
+    const head = `&lt;thead&gt;&lt;tr&gt;&lt;th&gt;&lt;/th&gt;${rs.map(r=&gt;`&lt;th&gt;${r.u.name}${r===best?&#x27;&lt;span class=&quot;tag best&quot;&gt;Recommended&lt;/span&gt;&#x27;:&#x27;&#x27;}&lt;span class=&quot;thsub&quot;&gt;with ${r.u.groundKw} kW ground unit&lt;/span&gt;&lt;/th&gt;`).join(&quot;&quot;)}&lt;/tr&gt;&lt;/thead&gt;`;
+    const row = (label,fn) =&gt; `&lt;tr&gt;&lt;th scope=&quot;row&quot;&gt;${label}&lt;/th&gt;${rs.map(r=&gt;{
+      if(!r.compatible) return `&lt;td class=&quot;na&quot;&gt;–&lt;/td&gt;`;
+      return `&lt;td&gt;${fn(r)}&lt;/td&gt;`;
+    }).join(&quot;&quot;)}&lt;/tr&gt;`;
+    const body = `&lt;tbody&gt;
+      &lt;tr&gt;&lt;th scope=&quot;row&quot;&gt;${p.cells}S support&lt;/th&gt;${rs.map(r=&gt;r.compatible?`&lt;td&gt;Yes&lt;/td&gt;`:`&lt;td class=&quot;warn&quot;&gt;No (${r.u.cells.map(c=&gt;c+&quot;S&quot;).join(&quot;, &quot;)} only)&lt;/td&gt;`).join(&quot;&quot;)}&lt;/tr&gt;
+      ${row(&quot;Max tether length&quot;, r=&gt;r.feasible?`${fmtLen(r.L)}`:`&lt;span class=&quot;warn&quot;&gt;Can’t lift&lt;/span&gt;`)}
+      ${row(&quot;Max payload capacity at full cable length&quot;, r=&gt;r.maxPayload&gt;0?`${fmtMass(r.maxPayload)} &lt;span class=&quot;tag&quot;&gt;at ${fmtLen(r.u.maxLen)}&lt;/span&gt;`:`&lt;span class=&quot;warn&quot;&gt;None at ${fmtLen(r.u.maxLen)}&lt;/span&gt;`)}
+      ${row(&quot;Total hover weight&quot;, r=&gt;`${fmtMass(r.total)} &lt;span class=&quot;tag&quot;&gt;${fmtMass(r.mtowMargin)} to MTOW&lt;/span&gt;`)}
+      ${row(&quot;Power available&quot;, r=&gt;`${fmt(r.avail,0)} W${r.avail &lt; r.u.power ? &#x27; &lt;span class=&quot;tag&quot;&gt;limited by ground unit&lt;/span&gt;&#x27; : &#x27;&#x27;}`)}
+      ${row(&quot;Hover power&quot;, r=&gt;`${fmt(r.pw,0)} W &lt;span class=&quot;tag&quot;&gt;${fmt(r.pw/r.avail*100,0)}% of available&lt;/span&gt;`)}
+      ${row(&quot;Power reserve applied&quot;, r=&gt;`${fmt(p.reserve*100,0)}% &lt;span class=&quot;tag&quot;&gt;${p.backup&gt;0?&quot;with backup battery&quot;:&quot;no backup battery&quot;}&lt;/span&gt;`)}
+    &lt;/tbody&gt;`;
+    $(&quot;cmp&quot;).innerHTML = head + body;
   }
 
   function renderChart(best,rs,p){
     const W=640,H=290,l=56,r=16,t=14,b=40;
-    const xs = L => l + L/150*(W-l-r);
-    const live = rs.filter(x=>x.compatible);
+    const xs = L =&gt; l + L/150*(W-l-r);
+    const live = rs.filter(x=&gt;x.compatible);
     let yMax = 1000;
-    live.forEach(x=>{ yMax=Math.max(yMax,x.u.power, hoverPower(x.fixed+x.w*x.u.maxLen,p)); });
+    live.forEach(x=&gt;{ yMax=Math.max(yMax,x.u.power, hoverPower(x.fixed+x.w*x.u.maxLen,p)); });
     yMax = Math.ceil(yMax*1.05/1000)*1000;
-    const ys = v => H-b - v/yMax*(H-t-b);
-    let s = `<g class="ax">`;
-    const step = yMax>8000?2000:1000;
-    for(let v=0;v<=yMax;v+=step){
-      s += `<line x1="${l}" x2="${W-r}" y1="${ys(v)}" y2="${ys(v)}"/><text x="${l-8}" y="${ys(v)+4}" text-anchor="end">${v/1000} kW</text>`;
+    const ys = v =&gt; H-b - v/yMax*(H-t-b);
+    let s = `&lt;g class=&quot;ax&quot;&gt;`;
+    const step = yMax&gt;8000?2000:1000;
+    for(let v=0;v&lt;=yMax;v+=step){
+      s += `&lt;line x1=&quot;${l}&quot; x2=&quot;${W-r}&quot; y1=&quot;${ys(v)}&quot; y2=&quot;${ys(v)}&quot;/&gt;&lt;text x=&quot;${l-8}&quot; y=&quot;${ys(v)+4}&quot; text-anchor=&quot;end&quot;&gt;${v/1000} kW&lt;/text&gt;`;
     }
     for(const v of (IMP ? [0,100,200,300,400,492] : [0,25,50,75,100,125,150])){
       const L = IMP ? v/M_FT : v;
-      s += `<text x="${xs(L)}" y="${H-b+18}" text-anchor="middle">${v} ${LU()}</text>`;
+      s += `&lt;text x=&quot;${xs(L)}&quot; y=&quot;${H-b+18}&quot; text-anchor=&quot;middle&quot;&gt;${v} ${LU()}&lt;/text&gt;`;
     }
-    s += `<text x="${(l+W-r)/2}" y="${H-4}" text-anchor="middle">Tether length</text><text transform="translate(12 ${(t+H-b)/2}) rotate(-90)" text-anchor="middle">Power draw</text></g>`;
-    let leg = "";
-    live.forEach(x=>{
+    s += `&lt;text x=&quot;${(l+W-r)/2}&quot; y=&quot;${H-4}&quot; text-anchor=&quot;middle&quot;&gt;Tether length&lt;/text&gt;&lt;text transform=&quot;translate(12 ${(t+H-b)/2}) rotate(-90)&quot; text-anchor=&quot;middle&quot;&gt;Power draw&lt;/text&gt;&lt;/g&gt;`;
+    let leg = &quot;&quot;;
+    live.forEach(x=&gt;{
       let okPts=[], overPts=[];
-      for(let L=0;L<=x.u.maxLen+0.01;L+=2){
+      for(let L=0;L&lt;=x.u.maxLen+0.01;L+=2){
         const kg = x.fixed + x.w*L;
         const pt = `${xs(L).toFixed(1)},${ys(hoverPower(kg,p)).toFixed(1)}`;
-        if(kg<=p.mtow) okPts.push(pt); else { if(!overPts.length&&okPts.length) overPts.push(okPts[okPts.length-1]); overPts.push(pt); }
+        if(kg&lt;=p.mtow) okPts.push(pt); else { if(!overPts.length&amp;&amp;okPts.length) overPts.push(okPts[okPts.length-1]); overPts.push(pt); }
       }
-      if(okPts.length>1) s += `<polyline points="${okPts.join(" ")}" fill="none" stroke="${x.u.color}" stroke-width="3"/>`;
-      if(overPts.length>1) s += `<polyline points="${overPts.join(" ")}" fill="none" stroke="${x.u.color}" stroke-width="3" opacity=".3"/>`;
-      s += `<line x1="${xs(0)}" x2="${xs(x.u.maxLen)}" y1="${ys(x.usable)}" y2="${ys(x.usable)}" stroke="${x.u.color}" stroke-width="2" stroke-dasharray="6 5"/>`;
+      if(okPts.length&gt;1) s += `&lt;polyline points=&quot;${okPts.join(&quot; &quot;)}&quot; fill=&quot;none&quot; stroke=&quot;${x.u.color}&quot; stroke-width=&quot;3&quot;/&gt;`;
+      if(overPts.length&gt;1) s += `&lt;polyline points=&quot;${overPts.join(&quot; &quot;)}&quot; fill=&quot;none&quot; stroke=&quot;${x.u.color}&quot; stroke-width=&quot;3&quot; opacity=&quot;.3&quot;/&gt;`;
+      s += `&lt;line x1=&quot;${xs(0)}&quot; x2=&quot;${xs(x.u.maxLen)}&quot; y1=&quot;${ys(x.usable)}&quot; y2=&quot;${ys(x.usable)}&quot; stroke=&quot;${x.u.color}&quot; stroke-width=&quot;2&quot; stroke-dasharray=&quot;6 5&quot;/&gt;`;
       if(x.feasible){
-        s += `<circle cx="${xs(x.L)}" cy="${ys(x.pw)}" r="5" fill="var(--surface)" stroke="${x.u.color}" stroke-width="2.5"/>`;
+        s += `&lt;circle cx=&quot;${xs(x.L)}&quot; cy=&quot;${ys(x.pw)}&quot; r=&quot;5&quot; fill=&quot;var(--surface)&quot; stroke=&quot;${x.u.color}&quot; stroke-width=&quot;2.5&quot;/&gt;`;
       }
-      leg += `<span><i style="border-color:${x.u.color}"></i>Hover power draw with ${x.u.id} air unit</span><span><i class="d" style="border-color:${x.u.color}"></i>Usable power with ${x.u.id} air unit (${fmt(x.usable,0)} W)</span>`;
+      leg += `&lt;span&gt;&lt;i style=&quot;border-color:${x.u.color}&quot;&gt;&lt;/i&gt;Hover power draw with ${x.u.id} air unit&lt;/span&gt;&lt;span&gt;&lt;i class=&quot;d&quot; style=&quot;border-color:${x.u.color}&quot;&gt;&lt;/i&gt;Usable power with ${x.u.id} air unit (${fmt(x.usable,0)} W)&lt;/span&gt;`;
     });
-    if(live.length) leg += `<span class="lbreak"></span><span><i class="faded"></i>Faded line: over MTOW</span><span><b class="c"></b>Circle: max tether length</span>`;
-    $("chart").innerHTML = s;
-    $("legend").innerHTML = leg;
+    if(live.length) leg += `&lt;span class=&quot;lbreak&quot;&gt;&lt;/span&gt;&lt;span&gt;&lt;i class=&quot;faded&quot;&gt;&lt;/i&gt;Faded line: over MTOW&lt;/span&gt;&lt;span&gt;&lt;b class=&quot;c&quot;&gt;&lt;/b&gt;Circle: max tether length&lt;/span&gt;`;
+    $(&quot;chart&quot;).innerHTML = s;
+    $(&quot;legend&quot;).innerHTML = leg;
   }
 
   function update(){
-    const tg = +$("tension").value;
-    $("tensionOut").textContent = IMP ? fmt(tg/28.3495,1) + " oz" : tg + " g";
-    $("coaxRow").hidden = $("layout").value !== "coax";
+    const tg = +$(&quot;tension&quot;).value;
+    $(&quot;tensionOut&quot;).textContent = IMP ? fmt(tg/28.3495,1) + &quot; oz&quot; : tg + &quot; g&quot;;
+    $(&quot;coaxRow&quot;).hidden = $(&quot;layout&quot;).value !== &quot;coax&quot;;
     const p = read();
     const errors = validate(p);
-    const rs = errors.length ? UNITS.map(u=>({u,compatible:false})) : UNITS.map(u=>evalUnit(u,p));
+    const rs = errors.length ? UNITS.map(u=&gt;({u,compatible:false})) : UNITS.map(u=&gt;evalUnit(u,p));
     const best = errors.length ? null : pick(rs);
     renderRec(best,rs,p,errors);
     renderTether(best,rs);
@@ -511,39 +577,792 @@ try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.docu
   function setUnits(imp){
     if(imp===IMP) return;
     const f = imp ? KG_LB : 1/KG_LB;
-    ["frame","mtow","payload","backup"].forEach(id=>{
+    [&quot;frame&quot;,&quot;mtow&quot;,&quot;payload&quot;,&quot;backup&quot;].forEach(id=&gt;{
       const v = num(id);
       if(Number.isFinite(v)) $(id).value = +(v*f).toFixed(2);
     });
-    const r = num("rho");
-    if(Number.isFinite(r)) $("rho").value = imp ? +(r*RHO_C).toFixed(4) : +(r/RHO_C).toFixed(3);
-    $("rho").step = imp ? "0.0005" : "0.005";
+    const r = num(&quot;rho&quot;);
+    if(Number.isFinite(r)) $(&quot;rho&quot;).value = imp ? +(r*RHO_C).toFixed(4) : +(r/RHO_C).toFixed(3);
+    $(&quot;rho&quot;).step = imp ? &quot;0.0005&quot; : &quot;0.005&quot;;
     IMP = imp;
-    document.querySelectorAll(".um").forEach(e=>e.textContent = imp ? "lb" : "kg");
-    document.querySelectorAll(".ur").forEach(e=>e.textContent = imp ? "lb/ft³" : "kg/m³");
-    $("rhoHint").textContent = imp ? "0.0765 at 59 °F sea level, 0.0724 at 86 °F" : "1.225 at 15 °C sea level, 1.16 at 30 °C";
+    document.querySelectorAll(&quot;.um&quot;).forEach(e=&gt;e.textContent = imp ? &quot;lb&quot; : &quot;kg&quot;);
+    document.querySelectorAll(&quot;.ur&quot;).forEach(e=&gt;e.textContent = imp ? &quot;lb/ft³&quot; : &quot;kg/m³&quot;);
+    $(&quot;rhoHint&quot;).textContent = imp ? &quot;0.0765 at 59 °F sea level, 0.0724 at 86 °F&quot; : &quot;1.225 at 15 °C sea level, 1.16 at 30 °C&quot;;
     update();
   }
-  document.querySelectorAll('input[name="units"]').forEach(e=>e.addEventListener("change",()=>setUnits(e.value==="imperial")));
-  const SUN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg>';
-  const MOON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11z"/></svg>';
-  const mq = window.matchMedia("(prefers-color-scheme: dark)");
-  const effTheme = () => document.documentElement.getAttribute("data-theme") || (mq.matches ? "dark" : "light");
+  document.querySelectorAll(&#x27;input[name=&quot;units&quot;]&#x27;).forEach(e=&gt;e.addEventListener(&quot;change&quot;,()=&gt;setUnits(e.value===&quot;imperial&quot;)));
+  const SUN = &#x27;&lt;svg viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;2&quot; stroke-linecap=&quot;round&quot; aria-hidden=&quot;true&quot;&gt;&lt;circle cx=&quot;12&quot; cy=&quot;12&quot; r=&quot;4.5&quot;/&gt;&lt;path d=&quot;M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8&quot;/&gt;&lt;/svg&gt;&#x27;;
+  const MOON = &#x27;&lt;svg viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;2&quot; stroke-linejoin=&quot;round&quot; aria-hidden=&quot;true&quot;&gt;&lt;path d=&quot;M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11z&quot;/&gt;&lt;/svg&gt;&#x27;;
+  const mq = window.matchMedia(&quot;(prefers-color-scheme: dark)&quot;);
+  const effTheme = () =&gt; document.documentElement.getAttribute(&quot;data-theme&quot;) || (mq.matches ? &quot;dark&quot; : &quot;light&quot;);
   function paintThemeBtn(){
-    const dark = effTheme() === "dark";
-    $("themeBtn").innerHTML = dark ? SUN : MOON;
-    $("themeBtn").setAttribute("aria-label", dark ? "Switch to light theme" : "Switch to dark theme");
+    const dark = effTheme() === &quot;dark&quot;;
+    $(&quot;themeBtn&quot;).innerHTML = dark ? SUN : MOON;
+    $(&quot;themeBtn&quot;).setAttribute(&quot;aria-label&quot;, dark ? &quot;Switch to light theme&quot; : &quot;Switch to dark theme&quot;);
   }
-  $("themeBtn").addEventListener("click", ()=>{
-    const next = effTheme() === "dark" ? "light" : "dark";
-    document.documentElement.setAttribute("data-theme", next);
-    try{ localStorage.setItem("theme", next); }catch(e){}
+  $(&quot;themeBtn&quot;).addEventListener(&quot;click&quot;, ()=&gt;{
+    const next = effTheme() === &quot;dark&quot; ? &quot;light&quot; : &quot;dark&quot;;
+    document.documentElement.setAttribute(&quot;data-theme&quot;, next);
+    try{ localStorage.setItem(&quot;theme&quot;, next); }catch(e){}
     paintThemeBtn();
   });
-  if(mq.addEventListener) mq.addEventListener("change", paintThemeBtn);
+  if(mq.addEventListener) mq.addEventListener(&quot;change&quot;, paintThemeBtn);
   paintThemeBtn();
-  $("f").addEventListener("input", update);
+  $(&quot;f&quot;).addEventListener(&quot;input&quot;, update);
   update();
+})();
+&lt;/script&gt;
+
+&lt;script&gt;
+(function(){
+  if (window.parent===window) return;
+  document.documentElement.classList.add(&#x27;embedded&#x27;);
+  var last=0;
+  function send(){ var h=Math.ceil(document.body.getBoundingClientRect().height)+2; if(h!==last){ last=h; parent.postMessage({vt:&#x27;height&#x27;,h:h},&#x27;*&#x27;); } }
+  if (window.ResizeObserver) new ResizeObserver(send).observe(document.body);
+  window.addEventListener(&#x27;load&#x27;,send); setTimeout(send,300);
+  window.addEventListener(&#x27;storage&#x27;,function(e){ if(e.key===&#x27;theme&#x27;){ if(e.newValue===&#x27;light&#x27;||e.newValue===&#x27;dark&#x27;) document.documentElement.setAttribute(&#x27;data-theme&#x27;,e.newValue); else document.documentElement.removeAttribute(&#x27;data-theme&#x27;); } });
+  window.addEventListener(&#x27;message&#x27;,function(e){ if(e.data&amp;&amp;e.data.vt===&#x27;theme&#x27;&amp;&amp;(e.data.t===&#x27;light&#x27;||e.data.t===&#x27;dark&#x27;)) document.documentElement.setAttribute(&#x27;data-theme&#x27;,e.data.t); });
+})();
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+"></iframe>
+<iframe id="f-planner" title="Electrical Integration Planner" srcdoc="&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;utf-8&quot;&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1, viewport-fit=cover&quot;&gt;
+&lt;title&gt;Electrical Integration Planner&lt;/title&gt;
+&lt;link rel=&quot;preconnect&quot; href=&quot;https://fonts.googleapis.com&quot;&gt;
+&lt;link rel=&quot;preconnect&quot; href=&quot;https://fonts.gstatic.com&quot; crossorigin&gt;
+&lt;link href=&quot;https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&amp;family=Barlow+Semi+Condensed:wght@500;600;700&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;
+&lt;script&gt;
+try{var t=localStorage.getItem(&quot;theme&quot;);if(t===&quot;light&quot;||t===&quot;dark&quot;)document.documentElement.setAttribute(&quot;data-theme&quot;,t);}catch(e){}
+&lt;/script&gt;
+&lt;style&gt;
+:root{
+  --bg:#E9EDF0; --surface:#FFFFFF; --ink:#18222D; --muted:#5A6875; --line:#C3CCD4;
+  --air:#E8A400; --air-soft:#FFF3D1; --air-ink:#4A3500;
+  --backup:#1F8A8A; --backup-soft:#DDF2F2;
+  --ok:#2B7A4B; --warn:#A65F00; --fail:#B3261E; --info:#46596B;
+  --pack:#D6DEE5;
+  color-scheme:light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme=&quot;light&quot;]){
+    --bg:#10161C; --surface:#18212A; --ink:#E6ECF1; --muted:#93A1AD; --line:#2E3B47;
+    --air:#F5B82E; --air-soft:#3A2E10; --air-ink:#FFE7AD;
+    --backup:#3DB5B5; --backup-soft:#123234;
+    --ok:#5CC48A; --warn:#F0A43C; --fail:#FF7A70; --info:#9DB0C2;
+    --pack:#2A3642;
+    color-scheme:dark;
+  }
+}
+:root[data-theme=&quot;dark&quot;]{
+  --bg:#10161C; --surface:#18212A; --ink:#E6ECF1; --muted:#93A1AD; --line:#2E3B47;
+  --air:#F5B82E; --air-soft:#3A2E10; --air-ink:#FFE7AD;
+  --backup:#3DB5B5; --backup-soft:#123234;
+  --ok:#5CC48A; --warn:#F0A43C; --fail:#FF7A70; --info:#9DB0C2;
+  --pack:#2A3642;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:&quot;Archivo&quot;,system-ui,-apple-system,&quot;Segoe UI&quot;,Roboto,sans-serif;font-size:16px;line-height:1.5;font-variation-settings:&quot;wdth&quot; 100}
+.wrap{max-width:1180px;margin:0 auto;padding:28px 20px 60px}
+header h1{font-size:clamp(1.6rem,3.2vw,2.2rem);font-weight:800;font-variation-settings:&quot;wdth&quot; 112;margin:0 0 6px;letter-spacing:-.01em}
+header p{margin:0;color:var(--muted);max-width:62ch}
+.grid{display:grid;grid-template-columns:320px 1fr;gap:28px;margin-top:28px;align-items:start}
+@media (max-width:860px){.grid{grid-template-columns:1fr}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px}
+.embedded .controls{position:static}
+.controls{position:sticky;top:calc(16px + env(safe-area-inset-top,0px))}
+@media (max-width:860px){.controls{position:static}}
+.controls h2,.out h2{font-size:1.05rem;font-weight:700;margin:0 0 12px}
+.group{border-top:1px solid var(--line);padding-top:16px;margin-top:16px}
+.group:first-of-type{border-top:0;padding-top:0;margin-top:0}
+label.f{display:block;font-size:.88rem;color:var(--muted);margin:12px 0 4px}
+.row{display:flex;gap:10px}
+.row&gt;div{flex:1}
+select,input[type=number]{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:8px 10px}
+input[type=range]{width:100%;accent-color:var(--air)}
+.stepper{display:flex;align-items:center;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--bg)}
+.stepper button{border:0;background:transparent;color:var(--ink);font:inherit;font-size:1.1rem;width:36px;height:38px;cursor:pointer}
+.stepper button:hover{background:var(--line)}
+.stepper output{flex:1;text-align:center;font-weight:700;font-variant-numeric:tabular-nums}
+.presets{display:flex;flex-wrap:wrap;gap:6px}
+.presets button{font:inherit;font-size:.85rem;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:5px 11px;cursor:pointer}
+.presets button[aria-pressed=&quot;true&quot;]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+:focus-visible{outline:2px solid var(--air);outline-offset:2px}
+.hint{font-size:.8rem;color:var(--muted);margin:4px 0 0}
+
+/* Readout */
+.readout{background:var(--surface);border:1px solid var(--line);border-left:6px solid var(--air);border-radius:10px;padding:20px 22px}
+.readout.bad{border-left-color:var(--fail)}
+.readout .cfg{font-size:clamp(1.9rem,5vw,3.1rem);font-weight:800;font-variation-settings:&quot;wdth&quot; 120;line-height:1.05;letter-spacing:-.015em;margin:0;font-variant-numeric:tabular-nums}
+.readout .cfg .arrow{color:var(--muted);font-weight:400;padding:0 .2em}
+.readout p{margin:8px 0 0;color:var(--muted);max-width:70ch}
+.out{display:flex;flex-direction:column;gap:20px;min-width:0}
+
+.diagram-wrap{overflow-x:auto}
+.diagrams{display:grid;grid-template-columns:1fr 1.4fr;gap:20px;align-items:stretch}
+@media (max-width:620px){.diagrams{grid-template-columns:1fr}}
+.diagrams h3{font-size:.9rem;font-weight:600;color:var(--muted);margin:0 0 8px}
+.diagrams&gt;div{display:flex;flex-direction:column}
+#before,#after{flex:1;display:flex;align-items:center;justify-content:center}
+#sch svg{margin:0 auto}
+svg{display:block;max-width:100%;height:auto}
+svg text{font-family:&quot;Archivo&quot;,system-ui,sans-serif}
+.opt{position:relative;display:flex;align-items:flex-start;gap:8px}
+.chk{display:flex;gap:10px;align-items:flex-start;cursor:pointer;font-weight:600;flex:1}
+.chk input{width:18px;height:18px;margin:2px 0 0;accent-color:var(--air);flex:none}
+.tipbtn{flex:none;width:24px;height:24px;border-radius:50%;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit;font-size:.8rem;font-weight:700;cursor:pointer;line-height:1}
+.tip{display:none;position:absolute;left:0;right:0;top:calc(100% + 8px);z-index:20;background:var(--ink);color:var(--surface);border-radius:8px;padding:12px 14px;font-size:.85rem;line-height:1.45;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+.tip p{margin:0 0 8px}.tip p:last-child{margin:0}
+.tipbtn:hover+.tip,.tipbtn:focus-visible+.tip,.tip.show{display:block}
+.warnbox{margin-top:14px;border:1px solid var(--warn);border-left:6px solid var(--warn);border-radius:8px;padding:12px 14px;font-size:.92rem}
+.warnbox b{color:var(--warn)}
+td.by{white-space:nowrap;color:var(--muted)}
+td.by.v{color:var(--ink);font-weight:700}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:.82rem;color:var(--muted);margin-top:12px}
+.legend span::before{content:&quot;&quot;;display:inline-block;width:11px;height:11px;border-radius:2px;margin-right:6px;vertical-align:-1px;background:var(--c);border:1px solid var(--line)}
+
+ol.steps{margin:0;padding:0;list-style:none;counter-reset:s}
+ol.steps li{counter-increment:s;position:relative;padding:0 0 14px 40px;max-width:72ch}
+ol.steps li::before{content:counter(s);position:absolute;left:0;top:0;width:26px;height:26px;border-radius:50%;background:var(--ink);color:var(--surface);font-weight:700;font-size:.85rem;display:grid;place-items:center}
+ol.steps li:last-child{padding-bottom:0}
+ol.steps li strong{font-weight:700}
+
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+td,th{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-weight:600;color:var(--muted);font-size:.85rem}
+td.q{font-weight:700;font-variant-numeric:tabular-nums;width:3.5em}
+tr:last-child td{border-bottom:0}
+
+ul.checks{list-style:none;margin:0;padding:0}
+ul.checks li{display:grid;grid-template-columns:22px 1fr;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+ul.checks li:last-child{border-bottom:0}
+.dot{width:14px;height:14px;border-radius:50%;margin-top:5px;background:var(--c)}
+ul.checks b{font-weight:600}
+ul.checks small{display:block;color:var(--muted);font-size:.88rem}
+
+.nums{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.num{border:1px solid var(--line);border-radius:8px;padding:12px}
+.num .v{font-size:1.4rem;font-weight:800;font-variation-settings:&quot;wdth&quot; 110;font-variant-numeric:tabular-nums}
+.num .l{font-size:.82rem;color:var(--muted)}
+.foot{font-size:.82rem;color:var(--muted);margin-top:12px;max-width:80ch}
+.hide{display:none!important}
+@media (prefers-reduced-motion:no-preference){
+  .readout .cfg{transition:color .2s}
+}
+
+.seg{display:flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--bg)}
+.seg button{flex:1;border:0;background:transparent;color:var(--ink);font:inherit;padding:9px 4px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;line-height:1.2}
+.seg .b{font-weight:700;font-size:.95rem}
+.seg .s{font-size:.78rem;font-weight:400;opacity:.75;font-variant-numeric:tabular-nums}
+label.f.q{color:var(--ink);font-weight:600;font-size:.92rem}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button[aria-pressed=&quot;true&quot;]{background:var(--ink);color:var(--surface)}
+.mini{margin-top:14px;border:1px solid var(--line);border-radius:8px;padding:12px;background:var(--bg)}
+.mini svg{margin:6px auto 0}
+.count{margin:0;font-size:1rem}
+.count strong{font-size:1.6rem;font-weight:800;font-variation-settings:&quot;wdth&quot; 115;margin-right:4px}
+.seg button:disabled{color:var(--muted);opacity:.5;cursor:not-allowed}
+
+/* ===== Match the Tether System Selector look ===== */
+:root{--bg:#E9EEF1;--surface:#F7F9FA;--ink:#17232B;--muted:#56666F;--line:#C9D3D9;--steel:#2E5B78;
+  --air:#D09400;--air-soft:#FBF0D0;--air-ink:#4A3500;--ok:#2B7148;--warn:#B07A00;--fail:#A8352A;--info:#56666F;--pack:#DDE5EA;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme=&quot;light&quot;]){--bg:#10181E;--surface:#18232B;--ink:#E4ECF0;--muted:#97A8B3;--line:#2C3B45;--steel:#7AAFD2;
+  --air:#F2B705;--air-soft:#3A2E0E;--air-ink:#FFE7A8;--ok:#62C08A;--warn:#F2B705;--fail:#E57367;--info:#97A8B3;--pack:#22313B;color-scheme:dark}}
+:root[data-theme=&quot;dark&quot;]{--bg:#10181E;--surface:#18232B;--ink:#E4ECF0;--muted:#97A8B3;--line:#2C3B45;--steel:#7AAFD2;
+  --air:#F2B705;--air-soft:#3A2E0E;--air-ink:#FFE7A8;--ok:#62C08A;--warn:#F2B705;--fail:#E57367;--info:#97A8B3;--pack:#22313B;color-scheme:dark}
+body{font-family:&quot;Barlow&quot;,system-ui,-apple-system,&quot;Segoe UI&quot;,Roboto,sans-serif;font-size:17px;line-height:1.5;font-variation-settings:normal}
+svg text{font-family:&quot;Barlow&quot;,system-ui,sans-serif}
+:focus-visible{outline:2px solid var(--steel);outline-offset:2px}
+.wrap{padding:28px 20px 56px}
+header h1{font-family:&quot;Barlow Semi Condensed&quot;,&quot;Barlow&quot;,system-ui,sans-serif;font-weight:700;font-size:2.1rem;line-height:1.1;margin:0 0 6px;letter-spacing:0;font-variation-settings:normal}
+header p{color:var(--muted);max-width:62ch}
+.grid{grid-template-columns:minmax(300px,380px) minmax(0,1fr);gap:32px;margin-top:20px}
+@media (max-width:880px){.grid{grid-template-columns:minmax(0,1fr)}}
+h2,.controls h2,.out h2{font-family:&quot;Barlow Semi Condensed&quot;,&quot;Barlow&quot;,system-ui,sans-serif;font-weight:600;font-size:1.25rem;margin:30px 0 10px}
+.out{gap:0}
+.out&gt;section:first-child h2{margin-top:0}
+.controls{background:none;border:0;padding:0;border-radius:0;position:static}
+.controls .group{border-top:0;padding-top:0;margin:0 0 22px}
+.controls .group h2{font-size:1.15rem;margin:0 0 4px}
+label.f,label.f.q{color:var(--ink);font-weight:500;font-size:1rem;margin:12px 0 6px}
+.hint{color:var(--muted);font-size:.85rem;line-height:1.3;margin:6px 0 0}
+select{border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:7px 8px;font:inherit;color:var(--ink)}
+.seg{background:var(--surface);border-color:var(--line)}
+.seg button{font-weight:500;padding:7px 4px}
+.seg .b{font-weight:600}
+.seg button[aria-pressed=&quot;true&quot;]{background:var(--ink);color:var(--bg)}
+.presets button{background:var(--surface);font-weight:500;font-size:.88rem}
+.presets button[aria-pressed=&quot;true&quot;]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.mini{background:var(--surface);border-radius:10px}
+.count strong{font-family:&quot;Barlow Semi Condensed&quot;,&quot;Barlow&quot;,system-ui,sans-serif;font-weight:700;font-variation-settings:normal}
+.chk{font-weight:500}
+.chk input{accent-color:var(--steel)}
+.opt{align-items:center;justify-content:flex-start}
+.opt .chk{flex:none}
+.tipbtn{width:18px;height:18px;padding:0;display:inline-flex;align-items:center;justify-content:center;border-radius:50%;border:1.5px solid var(--muted);background:transparent;color:var(--muted);font-size:.72rem;font-weight:600;line-height:1}
+.tipbtn:hover,.tipbtn:focus-visible{border-color:var(--steel);color:var(--steel);outline:none}
+.tip{left:0;right:auto;top:calc(100% + 6px);width:max-content;max-width:min(290px,80vw);padding:10px 12px;border-radius:8px;background:var(--ink);color:var(--bg);font-size:.86rem;line-height:1.4;box-shadow:0 6px 18px rgba(0,0,0,.2)}
+.tip p{margin:0 0 4px}
+.readout{background:var(--surface);border:1px solid var(--line);border-left:1px solid var(--line);border-radius:10px;padding:20px 22px}
+.readout.bad{border-left-color:var(--line)}
+.readout .cfg{font-family:&quot;Barlow Semi Condensed&quot;,&quot;Barlow&quot;,system-ui,sans-serif;font-weight:700;font-size:clamp(2rem,4.5vw,2.8rem);letter-spacing:0;font-variation-settings:normal;color:var(--steel)}
+.readout.bad .cfg{color:var(--fail)}
+.readout p{font-size:.95rem}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px 22px}
+.diagrams h3{font-family:&quot;Barlow&quot;,system-ui,sans-serif;font-weight:500;font-size:.88rem;color:var(--muted)}
+.foot{font-size:.82rem;line-height:1.45;color:var(--muted);margin:10px 2px 0}
+.legend{font-size:.88rem}
+table{font-variant-numeric:tabular-nums}
+th,td{padding:9px 10px}
+thead th{font-family:&quot;Barlow Semi Condensed&quot;,&quot;Barlow&quot;,system-ui,sans-serif;font-weight:600;font-size:1.05rem;color:var(--ink);border-bottom:2px solid var(--ink)}
+td.by.v{color:var(--steel)}
+ol.steps li::before{background:var(--ink);color:var(--bg);font-family:&quot;Barlow Semi Condensed&quot;,&quot;Barlow&quot;,system-ui,sans-serif}
+ul.checks b{font-weight:600}
+.out&gt;h2.sect{margin-top:0}
+.out .subh{font-family:&quot;Barlow Semi Condensed&quot;,&quot;Barlow&quot;,system-ui,sans-serif;font-weight:600;font-size:1.05rem;color:var(--ink);margin:22px 0 8px}
+.out&gt;h2.sect+section+section .subh{margin-top:4px}
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;div class=&quot;wrap&quot;&gt;
+  &lt;header&gt;
+    &lt;h1&gt;Electrical Integration Planner&lt;/h1&gt;
+    &lt;p&gt;Choose your drone’s bus voltage and how its batteries are connected. The planner shows which air-side unit fits and exactly what goes in each battery bay.&lt;/p&gt;
+  &lt;/header&gt;
+
+  &lt;div class=&quot;grid&quot;&gt;
+    &lt;aside class=&quot;controls&quot; aria-label=&quot;Your drone&quot;&gt;
+      &lt;div class=&quot;group&quot;&gt;
+        &lt;h2&gt;Common battery configuration&lt;/h2&gt;
+        &lt;div class=&quot;presets&quot; id=&quot;presets&quot;&gt;&lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;group&quot;&gt;
+        &lt;div class=&quot;opt&quot;&gt;
+          &lt;h2 style=&quot;margin:0&quot;&gt;Drone total battery voltage&lt;/h2&gt;
+          &lt;button type=&quot;button&quot; class=&quot;tipbtn&quot; aria-label=&quot;About total battery voltage&quot; aria-describedby=&quot;busTip&quot; aria-expanded=&quot;false&quot;&gt;?&lt;/button&gt;
+          &lt;div class=&quot;tip&quot; role=&quot;tooltip&quot; id=&quot;busTip&quot;&gt;
+            &lt;p&gt;The total voltage of all the battery cells in series that the drone flies on, given as a cell count (S).&lt;/p&gt;
+            &lt;p&gt;For example, two 6S packs in series make 12S (44.4 V). Packs in parallel add capacity, not voltage.&lt;/p&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;label class=&quot;f&quot; for=&quot;bus&quot;&gt;Total cells in series&lt;/label&gt;
+        &lt;select id=&quot;bus&quot;&gt;&lt;/select&gt;
+        &lt;p class=&quot;hint&quot;&gt;Voltages assume 3.7 V per cell (nominal).&lt;/p&gt;
+        &lt;p class=&quot;hint hide&quot; id=&quot;fromCalc&quot; style=&quot;color:var(--ok);font-weight:600&quot;&gt;Set to &lt;span id=&quot;fromCalcS&quot;&gt;&lt;/span&gt; from the Tether System Selector.&lt;/p&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;group&quot;&gt;
+        &lt;h2&gt;Battery connection&lt;/h2&gt;
+        &lt;label class=&quot;f q&quot; id=&quot;kL&quot;&gt;How many packs in series?&lt;/label&gt;
+        &lt;div class=&quot;seg&quot; role=&quot;group&quot; aria-labelledby=&quot;kL&quot; id=&quot;kSeg&quot;&gt;
+          &lt;button type=&quot;button&quot; data-k=&quot;1&quot;&gt;&lt;span class=&quot;b&quot;&gt;1 pack&lt;/span&gt;&lt;span class=&quot;s&quot; id=&quot;k1s&quot;&gt;&lt;/span&gt;&lt;/button&gt;&lt;button type=&quot;button&quot; data-k=&quot;2&quot;&gt;&lt;span class=&quot;b&quot;&gt;2 in series&lt;/span&gt;&lt;span class=&quot;s&quot; id=&quot;k2s&quot;&gt;&lt;/span&gt;&lt;/button&gt;
+        &lt;/div&gt;
+        &lt;p class=&quot;hint&quot;&gt;Packs joined + to −. Their voltages add up.&lt;/p&gt;
+        &lt;label class=&quot;f q&quot; id=&quot;pL&quot;&gt;How many strings in parallel?&lt;/label&gt;
+        &lt;div class=&quot;seg&quot; role=&quot;group&quot; aria-labelledby=&quot;pL&quot; id=&quot;pSeg&quot;&gt;
+          &lt;button type=&quot;button&quot; data-p=&quot;1&quot;&gt;&lt;span class=&quot;b&quot;&gt;1 string&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;no parallel&lt;/span&gt;&lt;/button&gt;&lt;button type=&quot;button&quot; data-p=&quot;2&quot;&gt;&lt;span class=&quot;b&quot;&gt;2 in parallel&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;2 strings&lt;/span&gt;&lt;/button&gt;
+        &lt;/div&gt;
+        &lt;p class=&quot;hint&quot;&gt;Strings joined + to + and − to −. Capacity adds up, voltage stays the same.&lt;/p&gt;
+        &lt;div class=&quot;mini&quot;&gt;
+          &lt;p class=&quot;count&quot; id=&quot;packCount&quot;&gt;&lt;/p&gt;
+          &lt;div id=&quot;mini&quot;&gt;&lt;/div&gt;
+          &lt;p class=&quot;hint&quot; id=&quot;packHint&quot;&gt;&lt;/p&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;group&quot;&gt;
+        &lt;h2&gt;Protection&lt;/h2&gt;
+        &lt;div class=&quot;opt&quot;&gt;
+          &lt;label class=&quot;chk&quot;&gt;&lt;input type=&quot;checkbox&quot; id=&quot;prot&quot; checked&gt; Use battery reverse current protector&lt;/label&gt;
+          &lt;button type=&quot;button&quot; class=&quot;tipbtn&quot; id=&quot;tipBtn&quot; aria-label=&quot;About the battery reverse current protector&quot; aria-describedby=&quot;protTip&quot; aria-expanded=&quot;false&quot;&gt;?&lt;/button&gt;
+          &lt;div class=&quot;tip&quot; role=&quot;tooltip&quot; id=&quot;protTip&quot;&gt;
+            &lt;p&gt;An ideal diode that sits between the battery and the drone. It lets the battery power the drone but blocks current flowing back into the battery.&lt;/p&gt;
+            &lt;p&gt;Without it, the air-side unit is wired straight to the battery. Whenever the air-side output is above the battery voltage, for example with a partly used pack, it pushes current into the battery with no limit on charge current or end voltage. This can overcharge the cells or charge them well beyond their rated current, leading to swelling, overheating and, in the worst case, thermal runaway and fire while the drone is in the air.&lt;/p&gt;
+            &lt;p&gt;If your battery is a smart battery with its own charge over-current protection, the system is safe without this protector.&lt;/p&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;p class=&quot;hint&quot; style=&quot;margin:4px 0 0 28px&quot;&gt;This module is provided by Volarious.&lt;/p&gt;
+      &lt;/div&gt;
+    &lt;/aside&gt;
+
+    &lt;main class=&quot;out&quot;&gt;
+      &lt;h2 class=&quot;sect&quot;&gt;Recommended Integration Diagram&lt;/h2&gt;
+      &lt;section class=&quot;readout hide&quot; id=&quot;readout&quot; aria-live=&quot;polite&quot;&gt;
+        &lt;p class=&quot;cfg&quot; id=&quot;cfg&quot;&gt;&lt;/p&gt;
+        &lt;p id=&quot;cfgNote&quot;&gt;&lt;/p&gt;
+      &lt;/section&gt;
+
+      &lt;section&gt;
+        &lt;h3 class=&quot;subh&quot;&gt;Battery bays&lt;/h3&gt;
+        &lt;div class=&quot;panel&quot;&gt;
+        &lt;div class=&quot;diagram-wrap&quot;&gt;
+          &lt;div class=&quot;diagrams&quot;&gt;
+            &lt;div&gt;&lt;h3&gt;Current configuration&lt;/h3&gt;&lt;div id=&quot;before&quot;&gt;&lt;/div&gt;&lt;/div&gt;
+            &lt;div id=&quot;afterBox&quot;&gt;&lt;h3&gt;With air-side unit integration&lt;/h3&gt;&lt;div id=&quot;after&quot;&gt;&lt;/div&gt;&lt;/div&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;warnbox hide&quot; id=&quot;noProtWarn&quot;&gt;&lt;b&gt;Battery not protected.&lt;/b&gt; The air-side unit is connected directly to the battery and can charge it with no current or voltage limit. Only use this setup with a smart battery that has its own charge over-current protection.&lt;/div&gt;
+        &lt;div class=&quot;legend&quot;&gt;
+          &lt;span style=&quot;--c:var(--pack)&quot;&gt;Battery pack&lt;/span&gt;
+          &lt;span style=&quot;--c:var(--air)&quot;&gt;Air-side unit and protector&lt;/span&gt;
+          &lt;span style=&quot;--c:var(--surface)&quot;&gt;Shorting plug, parallel adapter or empty bay&lt;/span&gt;
+        &lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/section&gt;
+
+      &lt;section id=&quot;schBox&quot;&gt;
+        &lt;h3 class=&quot;subh&quot; style=&quot;margin-bottom:2px&quot;&gt;Electrical schematic&lt;/h3&gt;
+        &lt;p style=&quot;margin:0 0 12px;color:var(--muted);font-size:.9rem&quot;&gt;After integrating the air-side unit&lt;/p&gt;
+        &lt;div class=&quot;panel&quot;&gt;&lt;div class=&quot;diagram-wrap&quot;&gt;&lt;div id=&quot;sch&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;
+        &lt;p class=&quot;foot&quot;&gt;Simplified circuit. Bays, connectors and the drone’s internal wiring are not shown. Current flows up from − to the + bus.&lt;/p&gt;
+      &lt;/section&gt;
+
+      &lt;section id=&quot;stepsBox&quot;&gt;
+        &lt;h2&gt;What to do&lt;/h2&gt;
+        &lt;ol class=&quot;steps&quot; id=&quot;steps&quot;&gt;&lt;/ol&gt;
+      &lt;/section&gt;
+
+      &lt;section id=&quot;partsBox&quot;&gt;
+        &lt;h2&gt;Parts you need&lt;/h2&gt;
+        &lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Qty&lt;/th&gt;&lt;th&gt;Part&lt;/th&gt;&lt;th&gt;Notes&lt;/th&gt;&lt;th&gt;Supplied by&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody id=&quot;parts&quot;&gt;&lt;/tbody&gt;&lt;/table&gt;
+      &lt;/section&gt;
+
+      &lt;section&gt;
+        &lt;h2&gt;Things to check further and inform Volarious&lt;/h2&gt;
+        &lt;ul class=&quot;checks&quot; id=&quot;checks&quot;&gt;&lt;/ul&gt;
+      &lt;/section&gt;
+    &lt;/main&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;script&gt;
+(function(){
+  var UNITS = [ {name:&#x27;3 kW&#x27;, s:[6,12,14]}, {name:&#x27;6 kW&#x27;, s:[12,14]} ];
+  var CELL = 3.7;
+  var PRESETS = [
+    {l:&#x27;6S&#x27;, S:6,k:1,p:1}, {l:&#x27;12S&#x27;, S:12,k:1,p:1}, {l:&#x27;14S&#x27;, S:14,k:1,p:1},
+    {l:&#x27;2S6S&#x27;, S:12,k:2,p:1}, {l:&#x27;2S7S&#x27;, S:14,k:2,p:1}, {l:&#x27;6S 2P&#x27;, S:6,k:1,p:2},
+    {l:&#x27;12S 2P&#x27;, S:12,k:1,p:2}, {l:&#x27;(2S6S) 2P&#x27;, S:12,k:2,p:2}
+  ];
+  var st = {S:12,k:2,p:1,prot:true};
+  var $ = function(id){return document.getElementById(id)};
+  function volts(S){ return (S*CELL).toFixed(1).replace(/\.0$/,&#x27;&#x27;)+&#x27; V&#x27;; }
+
+  var bus=$(&#x27;bus&#x27;);
+  [6,12,14].forEach(function(i){ var o=document.createElement(&#x27;option&#x27;); o.value=i; o.textContent=i+&#x27;S  (&#x27;+volts(i)+&#x27;)&#x27;; bus.appendChild(o); });
+  bus.addEventListener(&#x27;change&#x27;,function(){ st.S=+bus.value; if (st.S%2) st.k=1; render(); });
+  document.querySelectorAll(&#x27;[data-k]&#x27;).forEach(function(b){ b.addEventListener(&#x27;click&#x27;,function(){ st.k=+b.dataset.k; render(); }); });
+  document.querySelectorAll(&#x27;[data-p]&#x27;).forEach(function(b){ b.addEventListener(&#x27;click&#x27;,function(){ st.p=+b.dataset.p; render(); }); });
+  $(&#x27;prot&#x27;).addEventListener(&#x27;change&#x27;,function(e){ st.prot=e.target.checked; render(); });
+  document.querySelectorAll(&#x27;.tipbtn&#x27;).forEach(function(tb){
+    var tip=tb.nextElementSibling;
+    tb.addEventListener(&#x27;click&#x27;,function(){ var s=!tip.classList.contains(&#x27;show&#x27;); tip.classList.toggle(&#x27;show&#x27;,s); tb.setAttribute(&#x27;aria-expanded&#x27;,s); });
+    document.addEventListener(&#x27;click&#x27;,function(e){ if(!tb.contains(e.target)&amp;&amp;!tip.contains(e.target)){ tip.classList.remove(&#x27;show&#x27;); tb.setAttribute(&#x27;aria-expanded&#x27;,&#x27;false&#x27;); } });
+    document.addEventListener(&#x27;keydown&#x27;,function(e){ if(e.key===&#x27;Escape&#x27;){ tip.classList.remove(&#x27;show&#x27;); tb.setAttribute(&#x27;aria-expanded&#x27;,&#x27;false&#x27;); } });
+  });
+  var pre=$(&#x27;presets&#x27;);
+  PRESETS.forEach(function(p){
+    var b=document.createElement(&#x27;button&#x27;); b.type=&#x27;button&#x27;; b.textContent=p.l;
+    b.addEventListener(&#x27;click&#x27;,function(){ st.S=p.S; st.k=p.k; st.p=p.p; render(); });
+    pre.appendChild(b);
+  });
+
+  function layoutName(){
+    var ps=st.S/st.k, base = st.k===1 ? st.S+&#x27;S&#x27; : &#x27;2S&#x27;+ps+&#x27;S&#x27;;
+    if (st.p===1) return base;
+    return (st.k===1 ? base : &#x27;(&#x27;+base+&#x27;)&#x27;)+&#x27; 2P&#x27;;
+  }
+
+  var W=84,H=42,G=20,RG=16;
+  function svgGrid(mode,fits){
+    var k=st.k,p=st.p,S=st.S,ps=S/k, x0=26, split=isSplit(), after=mode===&#x27;after&#x27;, pr=st.prot;
+    var bw=118,bh=46,PH=42, gridW=k*W+(k-1)*G;
+    var top = (after &amp;&amp; !split) ? 10+bh+30 : 32;
+    var gridBot = top+p*H+(p-1)*RG;
+    var width=Math.max(x0+gridW+80, after?(x0+2*bw+16+20):180);
+    var xtra=(after &amp;&amp; !split &amp;&amp; p===2)?14:0;
+    var height = (after &amp;&amp; (pr || !split)) ? gridBot+28+xtra+bh+10 : gridBot+30;
+    var o=[];
+    o.push(&#x27;&lt;svg viewBox=&quot;0 0 &#x27;+width+&#x27; &#x27;+height+&#x27;&quot; width=&quot;&#x27;+width+&#x27;&quot; role=&quot;img&quot; aria-label=&quot;&#x27;+(after?&#x27;Bay layout with the air-side unit&#x27;:&#x27;Current bay layout&#x27;)+&#x27;&quot;&gt;&#x27;);
+    var busX=x0+gridW+14, gndX=x0-14, yTop=top+H/2, yBot=top+(p-1)*(H+RG)+H/2, yEnd=yTop-30;
+    o.push(&#x27;&lt;line x1=&quot;&#x27;+gndX+&#x27;&quot; y1=&quot;&#x27;+yEnd+&#x27;&quot; x2=&quot;&#x27;+gndX+&#x27;&quot; y2=&quot;&#x27;+yBot+&#x27;&quot; stroke=&quot;#111&quot; stroke-width=&quot;2&quot;/&gt;&#x27;);
+    o.push(&#x27;&lt;line x1=&quot;&#x27;+busX+&#x27;&quot; y1=&quot;&#x27;+yEnd+&#x27;&quot; x2=&quot;&#x27;+busX+&#x27;&quot; y2=&quot;&#x27;+yBot+&#x27;&quot; stroke=&quot;#D62828&quot; stroke-width=&quot;3&quot;/&gt;&#x27;);
+    o.push(&#x27;&lt;circle cx=&quot;&#x27;+gndX+&#x27;&quot; cy=&quot;&#x27;+yEnd+&#x27;&quot; r=&quot;4&quot; fill=&quot;var(--surface)&quot; stroke=&quot;#111&quot; stroke-width=&quot;2&quot;/&gt;&#x27;);
+    o.push(&#x27;&lt;circle cx=&quot;&#x27;+busX+&#x27;&quot; cy=&quot;&#x27;+yEnd+&#x27;&quot; r=&quot;4&quot; fill=&quot;var(--surface)&quot; stroke=&quot;#D62828&quot; stroke-width=&quot;2&quot;/&gt;&#x27;);
+    o.push(&#x27;&lt;text x=&quot;&#x27;+(busX+8)+&#x27;&quot; y=&quot;&#x27;+(yTop+4)+&#x27;&quot; font-size=&quot;12&quot; font-weight=&quot;700&quot; fill=&quot;var(--ink)&quot;&gt;&#x27;+S+&#x27;S&lt;/text&gt;&#x27;);
+    o.push(&#x27;&lt;text x=&quot;&#x27;+busX+&#x27;&quot; y=&quot;&#x27;+(yEnd-8)+&#x27;&quot; text-anchor=&quot;middle&quot; font-size=&quot;13&quot; font-weight=&quot;700&quot; fill=&quot;#D62828&quot;&gt;+&lt;/text&gt;&#x27;);
+    o.push(&#x27;&lt;text x=&quot;&#x27;+gndX+&#x27;&quot; y=&quot;&#x27;+(yEnd-8)+&#x27;&quot; text-anchor=&quot;middle&quot; font-size=&quot;13&quot; font-weight=&quot;700&quot; fill=&quot;var(--ink)&quot;&gt;\u2212&lt;/text&gt;&#x27;);
+    o.push(&#x27;&lt;text x=&quot;&#x27;+(busX+8)+&#x27;&quot; y=&quot;&#x27;+(yTop+18)+&#x27;&quot; font-size=&quot;10&quot; fill=&quot;var(--muted)&quot;&gt;&#x27;+volts(S)+&#x27;&lt;/text&gt;&#x27;);
+    function box(x,y,w,h,fill,stroke,label,sub,tc,dash){
+      o.push(&#x27;&lt;rect x=&quot;&#x27;+x+&#x27;&quot; y=&quot;&#x27;+y+&#x27;&quot; width=&quot;&#x27;+w+&#x27;&quot; height=&quot;&#x27;+h+&#x27;&quot; rx=&quot;6&quot; fill=&quot;&#x27;+fill+&#x27;&quot; stroke=&quot;&#x27;+stroke+&#x27;&quot; stroke-width=&quot;2&quot;&#x27;+(dash?&#x27; stroke-dasharray=&quot;4 3&quot;&#x27;:&#x27;&#x27;)+&#x27;/&gt;&#x27;);
+      o.push(&#x27;&lt;text x=&quot;&#x27;+(x+w/2)+&#x27;&quot; y=&quot;&#x27;+(y+(sub?h/2-3:h/2+4))+&#x27;&quot; text-anchor=&quot;middle&quot; font-size=&quot;12&quot; font-weight=&quot;700&quot; fill=&quot;&#x27;+tc+&#x27;&quot;&gt;&#x27;+label+&#x27;&lt;/text&gt;&#x27;);
+      if (sub) o.push(&#x27;&lt;text x=&quot;&#x27;+(x+w/2)+&#x27;&quot; y=&quot;&#x27;+(y+h/2+12)+&#x27;&quot; text-anchor=&quot;middle&quot; font-size=&quot;10&quot; fill=&quot;&#x27;+tc+&#x27;&quot;&gt;&#x27;+sub+&#x27;&lt;/text&gt;&#x27;);
+    }
+    function wire(x1,y1,x2,y2,c){ o.push(&#x27;&lt;line x1=&quot;&#x27;+x1+&#x27;&quot; y1=&quot;&#x27;+y1+&#x27;&quot; x2=&quot;&#x27;+x2+&#x27;&quot; y2=&quot;&#x27;+y2+&#x27;&quot; stroke=&quot;&#x27;+c+&#x27;&quot; stroke-width=&quot;3&quot;/&gt;&#x27;); }
+    var pbay=null;
+    for (var r=0;r&lt;p;r++){
+      var y=top+r*(H+RG), ym=y+H/2;
+      o.push(&#x27;&lt;line x1=&quot;&#x27;+gndX+&#x27;&quot; y1=&quot;&#x27;+ym+&#x27;&quot; x2=&quot;&#x27;+x0+&#x27;&quot; y2=&quot;&#x27;+ym+&#x27;&quot; stroke=&quot;var(--muted)&quot; stroke-width=&quot;2&quot;/&gt;&#x27;);
+      o.push(&#x27;&lt;line x1=&quot;&#x27;+(x0+gridW)+&#x27;&quot; y1=&quot;&#x27;+ym+&#x27;&quot; x2=&quot;&#x27;+busX+&#x27;&quot; y2=&quot;&#x27;+ym+&#x27;&quot; stroke=&quot;var(--ink)&quot; stroke-width=&quot;2&quot;/&gt;&#x27;);
+      for (var c=0;c&lt;k;c++){
+        var x=x0+c*(W+G);
+        if (c&lt;k-1) o.push(&#x27;&lt;line x1=&quot;&#x27;+(x+W)+&#x27;&quot; y1=&quot;&#x27;+ym+&#x27;&quot; x2=&quot;&#x27;+(x+W+G)+&#x27;&quot; y2=&quot;&#x27;+ym+&#x27;&quot; stroke=&quot;var(--ink)&quot; stroke-width=&quot;2&quot;/&gt;&#x27;);
+        var f=&#x27;var(--pack)&#x27;,s=&#x27;var(--line)&#x27;,l=ps+&#x27;S pack&#x27;,sub=&#x27;&#x27;,tc=&#x27;var(--ink)&#x27;,d=false;
+        if (after){
+          var prot = split ? (r===p-1&amp;&amp;c===k-1) : (r===0&amp;&amp;c===0);
+          if (prot &amp;&amp; pr){ f=&#x27;var(--air-soft)&#x27;;s=&#x27;var(--air)&#x27;;l=&#x27;Protector&#x27;;sub=split?&#x27;battery in only&#x27;:&#x27;2 inputs&#x27;;tc=&#x27;var(--air-ink)&#x27;;pbay={x:x,y:y}; }
+          else if (prot &amp;&amp; split){ pbay={x:x,y:y}; }
+          else if (prot){ f=&#x27;var(--surface)&#x27;;s=&#x27;var(--ink)&#x27;;l=&#x27;Parallel&#x27;;sub=&#x27;adapter&#x27;;pbay={x:x,y:y}; }
+          else if (split &amp;&amp; r===0 &amp;&amp; c===0){ f=&#x27;var(--air)&#x27;;s=&#x27;var(--air)&#x27;;l=&#x27;Air-side&#x27;;sub=S+&#x27;S&#x27;;tc=&#x27;#2A1E00&#x27;; }
+          else if (r===0){ f=&#x27;var(--surface)&#x27;;s=&#x27;var(--ink)&#x27;;l=&#x27;Shorting plug&#x27;; }
+          else if (split &amp;&amp; pr){ sub=&#x27;(Protected)&#x27;; }
+          else if (!split){ f=&#x27;var(--surface)&#x27;;s=&#x27;var(--muted)&#x27;;l=&#x27;Empty&#x27;;sub=&#x27;cover terminals&#x27;;tc=&#x27;var(--muted)&#x27;;d=true; }
+        }
+        box(x,y,W,H,f,s,l,sub,tc,d);
+      }
+    }
+    if (after &amp;&amp; pbay){
+      var cx=pbay.x+W/2;
+      function pl(t,x,y,c){ o.push(&#x27;&lt;text x=&quot;&#x27;+x+&#x27;&quot; y=&quot;&#x27;+y+&#x27;&quot; text-anchor=&quot;middle&quot; font-size=&quot;12&quot; font-weight=&quot;700&quot; fill=&quot;&#x27;+c+&#x27;&quot;&gt;&#x27;+t+&#x27;&lt;/text&gt;&#x27;); }
+      function bpath(d,c){ o.push(&#x27;&lt;path d=&quot;&#x27;+d+&#x27;&quot; fill=&quot;none&quot; stroke=&quot;&#x27;+c+&#x27;&quot; stroke-width=&quot;3&quot;/&gt;&#x27;); }
+      // backup above the bay: + and \u2212 leads down into the bay
+      function backupDown(bkc,yb,c){
+        var yp=pbay.y-14, ym=pbay.y-6;
+        bpath(&#x27;M&#x27;+(bkc-8)+&#x27; &#x27;+yb+&#x27; V &#x27;+yp+&#x27; H &#x27;+(cx+4)+&#x27; V &#x27;+pbay.y, &#x27;var(--muted)&#x27;);
+        bpath(&#x27;M&#x27;+(bkc+8)+&#x27; &#x27;+yb+&#x27; V &#x27;+ym+&#x27; H &#x27;+(cx+16)+&#x27; V &#x27;+pbay.y, c);
+        pl(&#x27;\u2212&#x27;,bkc-16,yb+13,&#x27;var(--muted)&#x27;); pl(&#x27;+&#x27;,bkc+17,yb+13,c);
+      }
+      if (!split){
+        // Air-side on top (passthrough), backup below (protected)
+        var by=10, ky=gridBot+28+xtra;
+        wire(cx-8,by+bh,cx-8,pbay.y,&#x27;var(--muted)&#x27;);
+        wire(cx+8,by+bh,cx+8,pbay.y,&#x27;var(--air)&#x27;);
+        pl(&#x27;\u2212&#x27;,cx-16,by+bh+13,&#x27;var(--muted)&#x27;); pl(&#x27;+&#x27;,cx+17,by+bh+13,&#x27;var(--air)&#x27;);
+        box(cx-bw/2,by,bw,bh,&#x27;var(--air)&#x27;,&#x27;var(--air)&#x27;,&#x27;Air-side &#x27;+S+&#x27;S&#x27;,pr?&#x27;(Passthrough)&#x27;:&#x27;&#x27;,&#x27;#2A1E00&#x27;);
+        if (p===1){
+          wire(cx-8,pbay.y+H,cx-8,ky,&#x27;var(--muted)&#x27;);
+          wire(cx+8,pbay.y+H,cx+8,ky,&#x27;var(--air)&#x27;);
+        } else {
+          // route down the gap between columns, past string 2
+          var ym1=pbay.y+H/2, gx=pbay.x+W;
+          bpath(&#x27;M&#x27;+gx+&#x27; &#x27;+(ym1+14)+&#x27; H &#x27;+(gx+6)+&#x27; V &#x27;+(gridBot+8)+&#x27; H &#x27;+(cx-8)+&#x27; V &#x27;+ky,&#x27;var(--muted)&#x27;);
+          bpath(&#x27;M&#x27;+gx+&#x27; &#x27;+(ym1+8)+&#x27; H &#x27;+(gx+14)+&#x27; V &#x27;+(gridBot+16)+&#x27; H &#x27;+(cx+8)+&#x27; V &#x27;+ky,&#x27;var(--air)&#x27;);
+        }
+        pl(&#x27;\u2212&#x27;,cx-16,ky-6,&#x27;var(--muted)&#x27;); pl(&#x27;+&#x27;,cx+17,ky-6,&#x27;var(--air)&#x27;);
+        box(cx-W/2,ky,W,H,&#x27;var(--pack)&#x27;,&#x27;var(--line)&#x27;,S+&#x27;S pack&#x27;,pr?&#x27;(Protected)&#x27;:&#x27;(Unprotected)&#x27;,&#x27;var(--ink)&#x27;);
+      } else if (pr) {
+        var ky=gridBot+28, kx=Math.max(4,cx-bw/2);
+        wire(cx-8,pbay.y+H,cx-8,ky,&#x27;var(--muted)&#x27;);
+        wire(cx+8,pbay.y+H,cx+8,ky,&#x27;var(--air)&#x27;);
+        pl(&#x27;\u2212&#x27;,cx-16,ky-6,&#x27;var(--muted)&#x27;); pl(&#x27;+&#x27;,cx+17,ky-6,&#x27;var(--air)&#x27;);
+        box(cx-W/2,ky,W,H,&#x27;var(--pack)&#x27;,&#x27;var(--line)&#x27;,ps+&#x27;S pack&#x27;,&#x27;(Protected)&#x27;,&#x27;var(--ink)&#x27;);
+      }
+    }
+    o.push(&#x27;&lt;/svg&gt;&#x27;);
+    return o.join(&#x27;&#x27;);
+  }
+
+  function isSplit(){ return st.p===2 &amp;&amp; (!st.prot || (st.S/st.k)&gt;=6); }
+  function splitSteps(S,k,ps){
+    var s=[];
+    s.push(&#x27;Power off the drone and remove the &#x27;+(k&gt;1?&#x27;&lt;strong&gt;2&lt;/strong&gt; packs&#x27;:&#x27;pack&#x27;)+&#x27; from string 1.&#x27;);
+    s.push(&#x27;Plug the &lt;strong&gt;&#x27;+S+&#x27;S air-side unit&lt;/strong&gt; into bay 1 of string 1.&#x27;);
+    if (k&gt;1) s.push(&#x27;Fit a &lt;strong&gt;shorting plug&lt;/strong&gt; into the other bay of string 1. It bridges that bay’s − and + so the series path stays closed, and carries the full bus current.&#x27;);
+    if (k===1) s.push(&#x27;In string 2, take out the &#x27;+S+&#x27;S pack, plug the &lt;strong&gt;battery reverse current protector&lt;/strong&gt; output into its bay, and connect the pack to the protector’s battery input. Leave the protector’s air-side input empty.&#x27;);
+    else s.push(&#x27;In string 2, take out the &#x27;+ps+&#x27;S pack in bay 2, plug the &lt;strong&gt;battery reverse current protector&lt;/strong&gt; output into that bay, and connect the pack to the protector’s battery input. Leave the protector’s air-side input empty. The other &#x27;+ps+&#x27;S pack stays where it is: one protector per string is enough because the whole string’s current passes through it.&#x27;);
+    s.push(&#x27;String 2 is now your backup. The protector stops the air-side unit from charging it, and it takes over if tether power drops.&#x27;);
+    s.push(&#x27;Ground test before flight: with props off, power up from the tether and confirm the bus reads about &#x27;+volts(S)+&#x27; and string 2 is not charging. Then cut tether power and confirm the drone stays powered from string 2.&#x27;);
+    return s;
+  }
+  function noProtSteps(S,k,p,ps,n,split){
+    var s=[];
+    s.push(&#x27;Power off the drone and remove &#x27;+(split?&#x27;the &#x27;+(k&gt;1?&#x27;&lt;strong&gt;2&lt;/strong&gt; packs&#x27;:&#x27;pack&#x27;)+&#x27; from string 1&#x27;:&#x27;all &lt;strong&gt;&#x27;+n+&#x27;&lt;/strong&gt; pack&#x27;+(n&gt;1?&#x27;s&#x27;:&#x27;&#x27;))+&#x27;.&#x27;);
+    s.push(split ? &#x27;Plug the &lt;strong&gt;&#x27;+S+&#x27;S air-side unit&lt;/strong&gt; into bay 1 of string 1.&#x27; : &#x27;Plug the &lt;strong&gt;parallel cable adapter&lt;/strong&gt; output into bay 1&#x27;+(p&gt;1?&#x27; of string 1&#x27;:&#x27;&#x27;)+&#x27;.&#x27;);
+    if (k&gt;1) s.push(&#x27;Fit a &lt;strong&gt;shorting plug&lt;/strong&gt; into the other bay of string 1. It bridges that bay\u2019s \u2212 and + so the series path stays closed, and carries the full bus current.&#x27;);
+    if (split) s.push(&#x27;Leave string 2 as it is. It is now your backup, but it is connected directly to the air-side unit and will be charged by it.&#x27;);
+    else {
+      if (p&gt;1) s.push(&#x27;Leave the other &lt;strong&gt;&#x27;+k+&#x27; bay&#x27;+(k&gt;1?&#x27;s&#x27;:&#x27;&#x27;)+&#x27;&lt;/strong&gt; empty and fit terminal covers.&#x27;);
+      s.push(&#x27;Connect the &lt;strong&gt;&#x27;+S+&#x27;S air-side unit&lt;/strong&gt; and a &lt;strong&gt;&#x27;+S+&#x27;S battery pack&lt;/strong&gt; to the two inputs of the parallel cable adapter. The battery pack will be charged directly by the air-side unit.&#x27;);
+    }
+    s.push(&#x27;Only fly this setup with smart batteries that have their own charge over-current protection.&#x27;);
+    s.push(&#x27;Ground test before flight: with props off, power up from the tether, confirm the bus reads about &#x27;+volts(S)+&#x27;, and check the battery\u2019s charge current stays within its rating. Then cut tether power and confirm the drone stays powered from the battery.&#x27;);
+    return s;
+  }
+  function noProtParts(S,k,p,unitTxt,split){
+    var r=[[1,S+&#x27;S air-side unit&#x27;,unitTxt+&#x27;, with your bay connector&#x27;]];
+    if (k&gt;1) r.push([1,&#x27;Shorting plug&#x27;,&#x27;Your bay connector, rated for full bus current&#x27;]);
+    if (!split){
+      if (p&gt;1) r.push([k,&#x27;Terminal cover&#x27;,&#x27;For unused bays&#x27;]);
+      r.push([1,&#x27;Parallel cable adapter&#x27;,&#x27;Air-side unit and battery pack in, one output to bay 1&#x27;]);
+      r.push([1,S+&#x27;S smart battery pack&#x27;,&#x27;Must have charge over-current protection&#x27;]);
+    }
+    return r;
+  }
+  function splitParts(S,k,unitTxt){
+    var p=[[1,S+&#x27;S air-side unit&#x27;,unitTxt+&#x27;, with your bay connector&#x27;],[1,&#x27;Battery reverse current protector&#x27;,&#x27;On string 2, battery input only&#x27;]];
+    if (k&gt;1) p.push([1,&#x27;Shorting plug&#x27;,&#x27;Your bay connector, rated for full bus current&#x27;]);
+    return p;
+  }
+
+  function miniSvg(ps,k,p,S){
+    var w=78,h=36,g=26,rg=14,x0=34,y0=22;
+    var gw=k*w+(k-1)*g, width=x0*2+gw, height=y0+p*h+(p-1)*rg+10;
+    var lx=x0-16, rx=x0+gw+16, yA=y0+h/2, yB=y0+(p-1)*(h+rg)+h/2;
+    var o=[&#x27;&lt;svg viewBox=&quot;0 0 &#x27;+width+&#x27; &#x27;+height+&#x27;&quot; width=&quot;&#x27;+width+&#x27;&quot; role=&quot;img&quot; aria-label=&quot;&#x27;+(k*p)+&#x27; packs, &#x27;+k+&#x27; in series, &#x27;+p+&#x27; in parallel&quot;&gt;&#x27;];
+    o.push(&#x27;&lt;line x1=&quot;&#x27;+lx+&#x27;&quot; y1=&quot;&#x27;+(yA-12)+&#x27;&quot; x2=&quot;&#x27;+lx+&#x27;&quot; y2=&quot;&#x27;+yB+&#x27;&quot; stroke=&quot;var(--muted)&quot; stroke-width=&quot;2&quot;/&gt;&#x27;);
+    o.push(&#x27;&lt;line x1=&quot;&#x27;+rx+&#x27;&quot; y1=&quot;&#x27;+(yA-12)+&#x27;&quot; x2=&quot;&#x27;+rx+&#x27;&quot; y2=&quot;&#x27;+yB+&#x27;&quot; stroke=&quot;var(--ink)&quot; stroke-width=&quot;3&quot;/&gt;&#x27;);
+    o.push(&#x27;&lt;text x=&quot;&#x27;+lx+&#x27;&quot; y=&quot;&#x27;+(yA-16)+&#x27;&quot; text-anchor=&quot;middle&quot; font-size=&quot;13&quot; font-weight=&quot;700&quot; fill=&quot;var(--muted)&quot;&gt;−&lt;/text&gt;&#x27;);
+    o.push(&#x27;&lt;text x=&quot;&#x27;+rx+&#x27;&quot; y=&quot;&#x27;+(yA-16)+&#x27;&quot; text-anchor=&quot;middle&quot; font-size=&quot;12&quot; font-weight=&quot;700&quot; fill=&quot;var(--ink)&quot;&gt;+&#x27;+S+&#x27;S&lt;/text&gt;&#x27;);
+    for (var r=0;r&lt;p;r++){
+      var y=y0+r*(h+rg), ym=y+h/2;
+      o.push(&#x27;&lt;line x1=&quot;&#x27;+lx+&#x27;&quot; y1=&quot;&#x27;+ym+&#x27;&quot; x2=&quot;&#x27;+x0+&#x27;&quot; y2=&quot;&#x27;+ym+&#x27;&quot; stroke=&quot;var(--muted)&quot; stroke-width=&quot;2&quot;/&gt;&#x27;);
+      o.push(&#x27;&lt;line x1=&quot;&#x27;+(x0+gw)+&#x27;&quot; y1=&quot;&#x27;+ym+&#x27;&quot; x2=&quot;&#x27;+rx+&#x27;&quot; y2=&quot;&#x27;+ym+&#x27;&quot; stroke=&quot;var(--ink)&quot; stroke-width=&quot;2&quot;/&gt;&#x27;);
+      for (var c=0;c&lt;k;c++){
+        var x=x0+c*(w+g);
+        if (c&lt;k-1) o.push(&#x27;&lt;line x1=&quot;&#x27;+(x+w)+&#x27;&quot; y1=&quot;&#x27;+ym+&#x27;&quot; x2=&quot;&#x27;+(x+w+g)+&#x27;&quot; y2=&quot;&#x27;+ym+&#x27;&quot; stroke=&quot;var(--ink)&quot; stroke-width=&quot;2&quot;/&gt;&#x27;);
+        o.push(&#x27;&lt;rect x=&quot;&#x27;+x+&#x27;&quot; y=&quot;&#x27;+y+&#x27;&quot; width=&quot;&#x27;+(w-5)+&#x27;&quot; height=&quot;&#x27;+h+&#x27;&quot; rx=&quot;5&quot; fill=&quot;var(--pack)&quot; stroke=&quot;var(--ink)&quot; stroke-width=&quot;1.5&quot;/&gt;&#x27;);
+        o.push(&#x27;&lt;rect x=&quot;&#x27;+(x+w-5)+&#x27;&quot; y=&quot;&#x27;+(ym-6)+&#x27;&quot; width=&quot;5&quot; height=&quot;12&quot; rx=&quot;1.5&quot; fill=&quot;var(--ink)&quot;/&gt;&#x27;);
+        o.push(&#x27;&lt;text x=&quot;&#x27;+(x+(w-5)/2)+&#x27;&quot; y=&quot;&#x27;+(ym+5)+&#x27;&quot; text-anchor=&quot;middle&quot; font-size=&quot;13&quot; font-weight=&quot;700&quot; fill=&quot;var(--ink)&quot;&gt;&#x27;+ps+&#x27;S&lt;/text&gt;&#x27;);
+      }
+    }
+    o.push(&#x27;&lt;/svg&gt;&#x27;);
+    return o.join(&#x27;&#x27;);
+  }
+
+  function schematic(){
+    var S=st.S,k=st.k,p=st.p,ps=S/k,pr=st.prot,split=isSplit();
+    var cols=[], topShort=false;
+    var air={t:&#x27;src&#x27;,l:&#x27;Air-side &#x27;+S+&#x27;S&#x27;,s:(pr&amp;&amp;!split)?&#x27;(Passthrough)&#x27;:&#x27;&#x27;};
+    if (split){
+      var c1=[air]; if (k&gt;1) c1.push({t:&#x27;short&#x27;,l:&#x27;Shorting plug&#x27;});
+      var c2=[]; for (var i=0;i&lt;k;i++) c2.push({t:&#x27;batt&#x27;,l:ps+&#x27;S pack&#x27;,s:pr?&#x27;(Protected)&#x27;:&#x27;&#x27;});
+      if (pr) c2.push({t:&#x27;diode&#x27;});
+      cols=[c1,c2];
+    } else {
+      var c=[{t:&#x27;batt&#x27;,l:S+&#x27;S pack&#x27;,s:pr?&#x27;(Protected)&#x27;:&#x27;(Unprotected)&#x27;}]; if (pr) c.push({t:&#x27;diode&#x27;});
+      cols=[[air],c]; topShort=k&gt;1;
+    }
+    var SL=64, maxN=Math.max.apply(null,cols.map(function(c){return c.length;}));
+    var top=40, bot=top+Math.max(maxN,2)*SL+20, colW=150, x0=40;
+    var lastX=x0+(cols.length-1)*colW;
+    var sx1=lastX+80, sx2=sx1+70;
+    var dx = topShort ? sx2+70 : lastX+colW;
+    var vx=x0-30, width=(dx+96)-vx, height=bot+34;
+    var o=[&#x27;&lt;svg viewBox=&quot;&#x27;+vx+&#x27; 0 &#x27;+width+&#x27; &#x27;+height+&#x27;&quot; width=&quot;&#x27;+width+&#x27;&quot; role=&quot;img&quot; aria-label=&quot;Electrical schematic&quot;&gt;&#x27;];
+    var INK=&#x27;var(--ink)&#x27;;
+    function ln(x1,y1,x2,y2,c,w){ o.push(&#x27;&lt;line x1=&quot;&#x27;+x1+&#x27;&quot; y1=&quot;&#x27;+y1+&#x27;&quot; x2=&quot;&#x27;+x2+&#x27;&quot; y2=&quot;&#x27;+y2+&#x27;&quot; stroke=&quot;&#x27;+(c||INK)+&#x27;&quot; stroke-width=&quot;&#x27;+(w||2)+&#x27;&quot;/&gt;&#x27;); }
+    function tx(t,x,y,opt){ opt=opt||{}; o.push(&#x27;&lt;text x=&quot;&#x27;+x+&#x27;&quot; y=&quot;&#x27;+y+&#x27;&quot; font-size=&quot;&#x27;+(opt.fs||12)+&#x27;&quot; font-weight=&quot;&#x27;+(opt.fw||600)+&#x27;&quot; text-anchor=&quot;&#x27;+(opt.a||&#x27;start&#x27;)+&#x27;&quot; fill=&quot;&#x27;+(opt.c||INK)+&#x27;&quot;&gt;&#x27;+t+&#x27;&lt;/text&gt;&#x27;); }
+    function cover(x,y,w,h){ o.push(&#x27;&lt;rect x=&quot;&#x27;+x+&#x27;&quot; y=&quot;&#x27;+y+&#x27;&quot; width=&quot;&#x27;+w+&#x27;&quot; height=&quot;&#x27;+h+&#x27;&quot; fill=&quot;var(--surface)&quot;/&gt;&#x27;); }
+    function label(x,y,l,s){ tx(l,x+28,y+(s?-2:4),{fw:700}); if (s) tx(s,x+28,y+13,{fs:11,fw:400,c:&#x27;var(--muted)&#x27;}); }
+    function dot(x,y){ o.push(&#x27;&lt;circle cx=&quot;&#x27;+x+&#x27;&quot; cy=&quot;&#x27;+y+&#x27;&quot; r=&quot;3.5&quot; fill=&quot;&#x27;+INK+&#x27;&quot;/&gt;&#x27;); }
+    // rails
+    if (topShort){
+      ln(x0,top,sx1,top); ln(sx2,top,dx,top);
+      dot(sx1,top); dot(sx2,top); ln(sx1,top,sx2,top,INK,5);
+      tx(&#x27;Shorting plug&#x27;,(sx1+sx2)/2,top-12,{a:&#x27;middle&#x27;,fs:11});
+    } else ln(x0,top,dx,top);
+    ln(x0,bot,dx,bot,&#x27;var(--muted)&#x27;);
+    tx(&#x27;+ &#x27;+S+&#x27;S bus&#x27;,dx+14,top+4,{fw:700});
+    tx(volts(S),dx+14,top+19,{fs:11,fw:400,c:&#x27;var(--muted)&#x27;});
+    tx(&#x27;\u2212&#x27;,dx+14,bot+5,{fw:700,c:&#x27;var(--muted)&#x27;});
+    if (!split &amp;&amp; !pr) tx(&#x27;Parallel cable adapter&#x27;,(x0+lastX)/2,top-12,{a:&#x27;middle&#x27;,fs:11});
+    cols.forEach(function(col,ci){
+      var x=x0+ci*colW, n=col.length, step=(bot-top)/n;
+      ln(x,top,x,bot); dot(x,top); dot(x,bot);
+      col.forEach(function(e,i){
+        var y=bot-(i+0.5)*step;
+        if (e.t===&#x27;batt&#x27;){
+          cover(x-18,y-9,36,18);
+          ln(x-17,y-5,x+17,y-5,INK,2.5); ln(x-9,y+5,x+9,y+5,INK,6);
+          tx(&#x27;+&#x27;,x-25,y-2,{fs:11,c:&#x27;var(--air)&#x27;,fw:700});
+          label(x,y,e.l,e.s);
+        } else if (e.t===&#x27;src&#x27;){
+          o.push(&#x27;&lt;circle cx=&quot;&#x27;+x+&#x27;&quot; cy=&quot;&#x27;+y+&#x27;&quot; r=&quot;17&quot; fill=&quot;var(--air-soft)&quot; stroke=&quot;var(--air)&quot; stroke-width=&quot;2.5&quot;/&gt;&#x27;);
+          tx(&#x27;+&#x27;,x,y-3,{a:&#x27;middle&#x27;,fs:12,fw:700,c:&#x27;var(--air-ink)&#x27;}); tx(&#x27;\u2212&#x27;,x,y+12,{a:&#x27;middle&#x27;,fs:12,fw:700,c:&#x27;var(--air-ink)&#x27;});
+          label(x,y,e.l,e.s);
+        } else if (e.t===&#x27;diode&#x27;){
+          cover(x-13,y-10,26,20);
+          o.push(&#x27;&lt;polygon points=&quot;&#x27;+(x-11)+&#x27;,&#x27;+(y+8)+&#x27; &#x27;+(x+11)+&#x27;,&#x27;+(y+8)+&#x27; &#x27;+x+&#x27;,&#x27;+(y-8)+&#x27;&quot; fill=&quot;var(--air)&quot; stroke=&quot;var(--air)&quot; stroke-width=&quot;1.5&quot; stroke-linejoin=&quot;round&quot;/&gt;&#x27;);
+          ln(x-12,y-9,x+12,y-9,INK,2.5);
+          label(x,y,&#x27;Protector&#x27;,&#x27;(Ideal Diode)&#x27;);
+        } else if (e.t===&#x27;short&#x27;){
+          cover(x-6,y-16,12,32); dot(x,y-13); dot(x,y+13); ln(x,y-13,x,y+13,INK,5);
+          label(x,y,e.l,&#x27;&#x27;);
+        }
+      });
+    });
+    // drone load
+    ln(dx,top,dx,bot); dot(dx,top); dot(dx,bot);
+    var ly=(top+bot)/2;
+    cover(dx-34,ly-24,68,48);
+    var dr=[];
+    [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(function(s){
+      var ax=dx+s[0]*22, ay=ly+s[1]*13;
+      dr.push(&#x27;&lt;line x1=&quot;&#x27;+dx+&#x27;&quot; y1=&quot;&#x27;+ly+&#x27;&quot; x2=&quot;&#x27;+ax+&#x27;&quot; y2=&quot;&#x27;+ay+&#x27;&quot; stroke=&quot;&#x27;+INK+&#x27;&quot; stroke-width=&quot;3&quot; stroke-linecap=&quot;round&quot;/&gt;&#x27;);
+      dr.push(&#x27;&lt;circle cx=&quot;&#x27;+ax+&#x27;&quot; cy=&quot;&#x27;+ay+&#x27;&quot; r=&quot;2.5&quot; fill=&quot;&#x27;+INK+&#x27;&quot;/&gt;&#x27;);
+      dr.push(&#x27;&lt;ellipse cx=&quot;&#x27;+ax+&#x27;&quot; cy=&quot;&#x27;+(ay-4)+&#x27;&quot; rx=&quot;11&quot; ry=&quot;3&quot; fill=&quot;var(--pack)&quot; stroke=&quot;&#x27;+INK+&#x27;&quot; stroke-width=&quot;1.5&quot;/&gt;&#x27;);
+    });
+    o.push(dr.join(&#x27;&#x27;));
+    o.push(&#x27;&lt;rect x=&quot;&#x27;+(dx-9)+&#x27;&quot; y=&quot;&#x27;+(ly-7)+&#x27;&quot; width=&quot;18&quot; height=&quot;14&quot; rx=&quot;4&quot; fill=&quot;var(--surface)&quot; stroke=&quot;&#x27;+INK+&#x27;&quot; stroke-width=&quot;2&quot;/&gt;&#x27;);
+    o.push(&#x27;&lt;line x1=&quot;&#x27;+(dx-5)+&#x27;&quot; y1=&quot;&#x27;+(ly+7)+&#x27;&quot; x2=&quot;&#x27;+(dx-9)+&#x27;&quot; y2=&quot;&#x27;+(ly+14)+&#x27;&quot; stroke=&quot;&#x27;+INK+&#x27;&quot; stroke-width=&quot;1.5&quot;/&gt;&lt;line x1=&quot;&#x27;+(dx+5)+&#x27;&quot; y1=&quot;&#x27;+(ly+7)+&#x27;&quot; x2=&quot;&#x27;+(dx+9)+&#x27;&quot; y2=&quot;&#x27;+(ly+14)+&#x27;&quot; stroke=&quot;&#x27;+INK+&#x27;&quot; stroke-width=&quot;1.5&quot;/&gt;&#x27;);
+    ln(dx,top,dx,ly-7); ln(dx,ly+7,dx,bot);
+    label(dx+12,ly,&#x27;Drone&#x27;,&#x27;load&#x27;);
+    o.push(&#x27;&lt;/svg&gt;&#x27;);
+    return o.join(&#x27;&#x27;);
+  }
+
+  function render(){
+    var S=st.S,k=st.k,p=st.p,ps=S/k,n=k*p;
+    bus.value=S;
+    document.querySelectorAll(&#x27;[data-k]&#x27;).forEach(function(b){
+      b.setAttribute(&#x27;aria-pressed&#x27;,+b.dataset.k===k?&#x27;true&#x27;:&#x27;false&#x27;);
+      b.disabled = (+b.dataset.k===2 &amp;&amp; S%2===1);
+    });
+    document.querySelectorAll(&#x27;[data-p]&#x27;).forEach(function(b){ b.setAttribute(&#x27;aria-pressed&#x27;,+b.dataset.p===p?&#x27;true&#x27;:&#x27;false&#x27;); });
+    $(&#x27;k1s&#x27;).textContent=S+&#x27;S&#x27;;
+    $(&#x27;k2s&#x27;).textContent=(S/2)+&#x27;S + &#x27;+(S/2)+&#x27;S&#x27;;
+    $(&#x27;packCount&#x27;).innerHTML = &#x27;&lt;strong&gt;&#x27;+n+&#x27;&lt;/strong&gt;&#x27;+(n&gt;1?&#x27;packs&#x27;:&#x27;pack&#x27;)+&#x27; of &#x27;+ps+&#x27;S (&#x27;+volts(ps)+&#x27;)&#x27;;
+    $(&#x27;mini&#x27;).innerHTML = miniSvg(ps,k,p,S);
+    var hint=[];
+    if (k&gt;1) hint.push(&#x27;In series: 2 × &#x27;+ps+&#x27;S = &#x27;+S+&#x27;S.&#x27;);
+    if (p&gt;1) hint.push(&#x27;In parallel: 2 strings share the load at &#x27;+S+&#x27;S.&#x27;);
+    if (!hint.length) hint.push(&#x27;One pack supplies the whole &#x27;+S+&#x27;S bus.&#x27;);
+    $(&#x27;packHint&#x27;).textContent = hint.join(&#x27; &#x27;);
+    var name=layoutName();
+    pre.querySelectorAll(&#x27;button&#x27;).forEach(function(b){ b.setAttribute(&#x27;aria-pressed&#x27;, b.textContent===name?&#x27;true&#x27;:&#x27;false&#x27;); });
+
+    var fits=UNITS.filter(function(u){return u.s.indexOf(S)&gt;=0;});
+    var protOK=S&gt;=6&amp;&amp;S&lt;=14, ok=protOK&amp;&amp;fits.length&gt;0, split=isSplit();
+    var unitTxt=fits.map(function(u){return u.name;}).join(&#x27; or &#x27;);
+
+    var ro=$(&#x27;readout&#x27;);
+    ro.classList.toggle(&#x27;bad&#x27;,!ok);
+    if (ok){
+      $(&#x27;cfg&#x27;).innerHTML=name+&#x27;&lt;span class=&quot;arrow&quot;&gt;→&lt;/span&gt;&#x27;+S+&#x27;S air-side&#x27;;
+      $(&#x27;cfgNote&#x27;).textContent=&#x27;Your drone runs on a &#x27;+S+&#x27;S bus (&#x27;+volts(S)+&#x27; nominal, assuming 3.7 V per cell). Available air-side units at this voltage: &#x27;+unitTxt+&#x27;. Use the Tether System Selector to choose between them.&#x27;+(split?&#x27; The air-side unit replaces string 1, and string 2 stays in place&#x27;+(st.prot?&#x27; behind a protector&#x27;:&#x27;&#x27;)+&#x27; as the backup.&#x27;:&#x27;&#x27;);
+    } else {
+      $(&#x27;cfg&#x27;).innerHTML=name+&#x27;&lt;span class=&quot;arrow&quot;&gt;→&lt;/span&gt;no direct match&#x27;;
+      $(&#x27;cfgNote&#x27;).textContent=&#x27;Your drone runs on a &#x27;+S+&#x27;S bus (&#x27;+volts(S)+&#x27;). Air-side units come in 6S, 12S and 14S (6 kW: 12S and 14S only)&#x27;+(protOK?&#x27;&#x27;:&#x27;, and the in-line protector works from 6S to 14S&#x27;)+&#x27;. Contact us to discuss a custom option.&#x27;;
+    }
+
+    $(&#x27;before&#x27;).innerHTML=svgGrid(&#x27;before&#x27;,fits);
+    $(&#x27;noProtWarn&#x27;).classList.toggle(&#x27;hide&#x27;, !ok || st.prot);
+    [&#x27;afterBox&#x27;,&#x27;stepsBox&#x27;,&#x27;partsBox&#x27;,&#x27;schBox&#x27;].forEach(function(id){ $(id).classList.toggle(&#x27;hide&#x27;,!ok); });
+    if (ok) $(&#x27;sch&#x27;).innerHTML=schematic();
+
+    if (ok){
+      $(&#x27;after&#x27;).innerHTML=svgGrid(&#x27;after&#x27;,fits);
+      var s=[];
+      s.push(&#x27;Power off the drone and remove all &lt;strong&gt;&#x27;+n+&#x27;&lt;/strong&gt; pack&#x27;+(n&gt;1?&#x27;s&#x27;:&#x27;&#x27;)+&#x27;.&#x27;);
+      s.push(&#x27;Plug the &lt;strong&gt;battery reverse current protector&lt;/strong&gt; output into bay 1&#x27;+(n&gt;1?&#x27; of string 1&#x27;:&#x27;&#x27;)+&#x27;.&#x27;);
+      if (k&gt;1) s.push(&#x27;Fit a &lt;strong&gt;shorting plug&lt;/strong&gt; into the other bay of string 1. It bridges that bay’s − and + so the series path stays closed, and carries the full bus current.&#x27;);
+      if (p&gt;1) s.push(&#x27;Leave the other &lt;strong&gt;&#x27;+k+&#x27; bay&#x27;+(k&gt;1?&#x27;s&#x27;:&#x27;&#x27;)+&#x27;&lt;/strong&gt; empty and fit terminal covers. Some of these terminals are at bus voltage once the air-side unit is powered. Do not put batteries back in them: a pack connected directly to the bus would be charged by the air-side unit with no control.&#x27;);
+      s.push(&#x27;Connect the &lt;strong&gt;&#x27;+S+&#x27;S air-side unit&lt;/strong&gt; to the protector’s air-side input.&#x27;);
+      if (k===1) s.push(&#x27;Connect one of your &lt;strong&gt;&#x27;+S+&#x27;S packs&lt;/strong&gt; to the protector’s battery input. The ideal diode stops the air-side unit from charging it.&#x27;);
+      else s.push(&#x27;Connect a &lt;strong&gt;&#x27;+S+&#x27;S battery pack&lt;/strong&gt; to the protector’s battery input: either a single &#x27;+S+&#x27;S pack, or two of your &#x27;+ps+&#x27;S packs joined with a series lead.&#x27;);
+      s.push(&#x27;Ground test before flight: with props off, power up from the tether and confirm the bus reads about &#x27;+volts(S)+&#x27;. Then cut tether power and confirm the drone stays powered from the backup.&#x27;);
+      if (split) s=splitSteps(S,k,ps);
+      if (!st.prot) s=noProtSteps(S,k,p,ps,n,split);
+      $(&#x27;steps&#x27;).innerHTML=s.map(function(x){return &#x27;&lt;li&gt;&#x27;+x+&#x27;&lt;/li&gt;&#x27;;}).join(&#x27;&#x27;);
+
+      var parts=[[1,S+&#x27;S air-side unit&#x27;,unitTxt]];
+      parts.push([1,&#x27;Battery reverse current protector&#x27;,&#x27;6S to 14S, sits in bay 1&#x27;]);
+      if (k&gt;1) parts.push([1,&#x27;Shorting plug&#x27;,&#x27;Your bay connector, rated for full bus current&#x27;]);
+      if (p&gt;1) parts.push([k,&#x27;Terminal cover&#x27;,&#x27;For unused bays&#x27;]);
+      if (k===1) parts.push([1,S+&#x27;S battery pack&#x27;,&#x27;Can be one of your existing packs&#x27;]);
+      else parts.push([1,S+&#x27;S battery pack, or series lead&#x27;,&#x27;Series lead joins 2 × &#x27;+ps+&#x27;S packs into &#x27;+S+&#x27;S&#x27;]);
+      if (split) parts=splitParts(S,k,unitTxt);
+      if (!st.prot) parts=noProtParts(S,k,p,unitTxt,split);
+      $(&#x27;parts&#x27;).innerHTML=parts.map(function(r){ var v=/air-side unit|reverse current protector|^Shorting plug/.test(r[1]); return &#x27;&lt;tr&gt;&lt;td class=&quot;q&quot;&gt;&#x27;+r[0]+&#x27;&lt;/td&gt;&lt;td&gt;&#x27;+r[1]+&#x27;&lt;/td&gt;&lt;td&gt;&#x27;+r[2]+&#x27;&lt;/td&gt;&lt;td class=&quot;by&#x27;+(v?&#x27; v&#x27;:&#x27;&#x27;)+&#x27;&quot;&gt;&#x27;+(v?&#x27;Volarious&#x27;:&#x27;You&#x27;)+&#x27;&lt;/td&gt;&lt;/tr&gt;&#x27;;}).join(&#x27;&#x27;);
+    }
+
+    var C=[],OK=&#x27;var(--ok)&#x27;,F=&#x27;var(--fail)&#x27;,I=&#x27;var(--info)&#x27;;
+    if (!st.prot) C.push([F,&#x27;Battery not protected&#x27;,&#x27;No reverse current protector. Safe only with smart batteries that have charge over-current protection.&#x27;]);
+    if (st.prot) C.push(protOK?[OK,&#x27;Protector voltage range&#x27;,&#x27;Bus is &#x27;+S+&#x27;S, inside 6S to 14S.&#x27;]:[F,&#x27;Protector voltage range&#x27;,&#x27;Bus is &#x27;+S+&#x27;S, outside 6S to 14S.&#x27;]);
+    C.push(fits.length?[OK,&#x27;Air-side output voltage&#x27;,&#x27;Available in &#x27;+S+&#x27;S: &#x27;+unitTxt+&#x27;.&#x27;]:[F,&#x27;Air-side output voltage&#x27;,&#x27;No air-side unit outputs &#x27;+S+&#x27;S.&#x27;]);
+    C=C.filter(function(c){ return !/^(Protector voltage range|Air-side output voltage)$/.test(c[1]); });
+    if (split &amp;&amp; st.prot) C.push([OK,&#x27;Protector on string 2&#x27;,&#x27;It protects &#x27;+(k===1?&#x27;the &#x27;+S+&#x27;S pack&#x27;:&#x27;one &#x27;+ps+&#x27;S pack&#x27;)+&#x27; (&#x27;+volts(ps)+&#x27;), inside 6S to 14S.&#x27;]);
+    else if (p===2 &amp;&amp; st.prot) C.push([I,&#x27;String 2 can’t stay in place&#x27;,&#x27;Each pack is &#x27;+ps+&#x27;S, below the protector’s 6S minimum. Remove string 2 and use a &#x27;+S+&#x27;S backup through the protector in bay 1 instead.&#x27;]);
+    C.push([I,&#x27;Smart batteries&#x27;,&#x27;Check if your drone uses smart batteries that talk to the flight controller over SMBus or DroneCAN. If so, tell us which, and check whether the drone will arm without a battery in bay 1.&#x27;]);
+    C.push([I,&#x27;Connector type&#x27;,&#x27;Check the battery connector type on your drone and send us the part number, so the protector and shorting plug match.&#x27;]);
+    C.push([I,&#x27;Battery cable length&#x27;,&#x27;Measure the length of the battery’s power cable, from the pack to its connector.&#x27;]);
+    C.push([I,&#x27;Battery bay photos&#x27;,&#x27;Send Volarious photos of the battery bay with the battery fitted and with it removed.&#x27;]);
+    C.push([I,&#x27;Tether hooking point&#x27;,&#x27;Find a suitable mounting point on the drone to hook the tether cable to.&#x27;]);
+    C.push([I,&#x27;Tether plug length&#x27;,&#x27;Measure the cable length needed from the tether hooking point to plug into the air-side unit.&#x27;]);
+    $(&#x27;checks&#x27;).innerHTML=C.map(function(c){return &#x27;&lt;li&gt;&lt;span class=&quot;dot&quot; style=&quot;--c:&#x27;+c[0]+&#x27;&quot;&gt;&lt;/span&gt;&lt;div&gt;&lt;b&gt;&#x27;+c[1]+&#x27;&lt;/b&gt;&lt;small&gt;&#x27;+c[2]+&#x27;&lt;/small&gt;&lt;/div&gt;&lt;/li&gt;&#x27;;}).join(&#x27;&#x27;);
+  }
+  window.addEventListener(&#x27;message&#x27;,function(e){
+    var d=e.data; if(!d||d.vt!==&#x27;setCells&#x27;) return;
+    if ([6,12,14].indexOf(+d.cells)&lt;0) return;
+    st.S=+d.cells; render();
+    $(&#x27;fromCalcS&#x27;).textContent=d.cells+&#x27;S&#x27;; $(&#x27;fromCalc&#x27;).classList.remove(&#x27;hide&#x27;);
+  });
+  bus.addEventListener(&#x27;change&#x27;,function(){ $(&#x27;fromCalc&#x27;).classList.add(&#x27;hide&#x27;); });
+  render();
+})();
+&lt;/script&gt;
+
+&lt;script&gt;
+(function(){
+  if (window.parent===window) return;
+  document.documentElement.classList.add(&#x27;embedded&#x27;);
+  var last=0;
+  function send(){ var h=Math.ceil(document.body.getBoundingClientRect().height)+2; if(h!==last){ last=h; parent.postMessage({vt:&#x27;height&#x27;,h:h},&#x27;*&#x27;); } }
+  if (window.ResizeObserver) new ResizeObserver(send).observe(document.body);
+  window.addEventListener(&#x27;load&#x27;,send); setTimeout(send,300);
+  window.addEventListener(&#x27;storage&#x27;,function(e){ if(e.key===&#x27;theme&#x27;){ if(e.newValue===&#x27;light&#x27;||e.newValue===&#x27;dark&#x27;) document.documentElement.setAttribute(&#x27;data-theme&#x27;,e.newValue); else document.documentElement.removeAttribute(&#x27;data-theme&#x27;); } });
+  window.addEventListener(&#x27;message&#x27;,function(e){ if(e.data&amp;&amp;e.data.vt===&#x27;theme&#x27;&amp;&amp;(e.data.t===&#x27;light&#x27;||e.data.t===&#x27;dark&#x27;)) document.documentElement.setAttribute(&#x27;data-theme&#x27;,e.data.t); });
+})();
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+" hidden></iframe>
+<script>
+(function(){
+  var frames={calculator:document.getElementById('f-calculator'), planner:document.getElementById('f-planner')};
+  function view(){ var h=(location.hash||'').slice(1); return frames[h]?h:'calculator'; }
+  function show(){
+    var v=view();
+    Object.keys(frames).forEach(function(k){
+      frames[k].hidden = k!==v;
+      var t=document.getElementById('tab-'+k);
+      if (k===v) t.setAttribute('aria-current','page'); else t.removeAttribute('aria-current');
+    });
+  }
+  window.addEventListener('hashchange',function(){ show(); window.scrollTo(0,0); });
+  show();
+  window.addEventListener('message',function(e){
+    var d=e.data; if(!d||!d.vt) return;
+    if (d.vt==='height'){
+      Object.keys(frames).forEach(function(k){ if(frames[k].contentWindow===e.source) frames[k].style.height=d.h+'px'; });
+    } else if (d.vt==='plan' && e.source===frames.calculator.contentWindow){
+      frames.planner.contentWindow.postMessage({vt:'setCells',cells:d.cells},'*');
+      location.hash='planner';
+    }
+  });
+  var SUN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg>';
+  var MOON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11z"/></svg>';
+  var mq=window.matchMedia('(prefers-color-scheme: dark)'), tb=document.getElementById('themeBtn');
+  function eff(){ return document.documentElement.getAttribute('data-theme') || (mq.matches?'dark':'light'); }
+  function paint(){ var d=eff()==='dark'; tb.innerHTML=d?SUN:MOON; tb.setAttribute('aria-label',d?'Switch to light theme':'Switch to dark theme'); }
+  tb.addEventListener('click',function(){
+    var next=eff()==='dark'?'light':'dark';
+    document.documentElement.setAttribute('data-theme',next);
+    try{ localStorage.setItem('theme',next); }catch(e){}
+    Object.keys(frames).forEach(function(k){ frames[k].contentWindow.postMessage({vt:'theme',t:next},'*'); });
+    paint();
+  });
+  if (mq.addEventListener) mq.addEventListener('change',paint);
+  paint();
+  window.addEventListener('storage',function(e){ if(e.key==='theme'){ if(e.newValue==='light'||e.newValue==='dark') document.documentElement.setAttribute('data-theme',e.newValue); else document.documentElement.removeAttribute('data-theme'); } });
 })();
 </script>
 </body>
